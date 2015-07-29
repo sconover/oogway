@@ -16,7 +16,9 @@ import turtle
 class TestTurtle(unittest.TestCase):
   def test_basic(self):
     mcpi_minecraft = mcpi.minecraft.Minecraft.create()
-    mcpi_minecraft.setBlockV2(1, 120, 1, block.STONE.name, variant=block.STONE.VARIANT_ANDESITE.value)
+    # mcpi_minecraft.setBlockV2(1, 120, 1, block.STONE.name, variant=block.STONE.VARIANT_ANDESITE.value)
+    # mcpi_minecraft.setBlockV2(1, 127, 1, block.STONE.name, block.STONE.VARIANT_ANDESITE)
+    mcpi_minecraft.setBlockV2(1, 130, 1, block.PISTON.name, block.PISTON.FACING_DOWN)
 
 # pen_down(blocks.SAND, blocks.SAND.VARIANT_RED_SAND)
 # pen_up()

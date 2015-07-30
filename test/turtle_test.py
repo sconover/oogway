@@ -13,7 +13,7 @@ sys.path.append(turtle_path)
 import unittest
 import mcpi.minecraft
 import mcpi
-from oogway.turtle import init, chat, begin
+from oogway.turtle import init, chat, begin, forward
 
 class TestTurtle(unittest.TestCase):
   def test_basic(self):
@@ -27,6 +27,7 @@ class TestTurtle(unittest.TestCase):
     init(mcpi_minecraft, "papadapadapa")
     chat("hi")
     begin()
+    forward()
 
     # print mcpi_minecraft.player.getTilePos()
     # print mcpi_minecraft.player.getDirection()

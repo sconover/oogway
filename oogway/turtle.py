@@ -1,5 +1,6 @@
 from mcgamedata import block
 from collections import namedtuple
+from time import sleep
 
 class Position():
   def __init__(self,x,y,z):
@@ -18,13 +19,12 @@ class TurtleSession():
     self.position = position
     self.direction = direction
     self.delay = 0.1
-    self.trail = mcpi.block.OBSIDIAN
+    self.trail = [block.OBSIDIAN]
 
 class Minecraft():
   def __init__(self):
     self.mcpi_minecraft = None
     self.player = None
-    self.turtle_session = None
 
   def _m(self):
     return self.mcpi_minecraft
@@ -53,6 +53,7 @@ minecraft = Minecraft()
 def init(mcpi_minecraft, player=None):
   minecraft.mcpi_minecraft = mcpi_minecraft
   minecraft.player = player
+  minecraft.turtle_session = None
 
 def chat(message):
   minecraft.chat(message)
@@ -68,25 +69,52 @@ def begin():
   y_diff = 0
   z_diff = 0
   facing = None
+  yaw = None
   if rotation_degrees >= 315 and rotation_degrees < 360 or \
      rotation_degrees >= 0 and rotation_degrees < 45:
     z_diff = 10 # south
     facing = block.PISTON.FACING_SOUTH
+    yaw = 0
   elif rotation_degrees >= 45 and rotation_degrees < 135:
     x_diff = -10
     facing = block.PISTON.FACING_WEST
+    yaw = 90
   elif rotation_degrees >= 135 and rotation_degrees < 225:
     z_diff = -10 # north
     facing = block.PISTON.FACING_NORTH
+    yaw = 180
   else:
     x_diff = 10
     facing = block.PISTON.FACING_EAST
+    yaw = 270
 
+  start_x = pos.x + x_diff
+  start_y = pos.y + y_diff
+  start_z = pos.z + z_diff
+  minecraft.turtle_session = TurtleSession(Position(start_x, start_y, start_z), Direction(yaw, 90, 0))
+  _draw_turtle()
+
+def _draw_turtle():
+  turtle = minecraft.turtle_session
   minecraft.set_block(
-    pos.x + x_diff,
-    pos.y + y_diff,
-    pos.z + z_diff,
-    block.PISTON, facing)
+    turtle.position.x, turtle.position.y, turtle.position.z,
+    block.PISTON, _turtle_facing())
+
+def _turtle_facing():
+  turtle = minecraft.turtle_session
+  if turtle.direction.yaw == 0:
+    return block.PISTON.FACING_SOUTH
+  elif turtle.direction.yaw == 90:
+    return block.PISTON.FACING_WEST
+  elif turtle.direction.yaw == 180:
+    return block.PISTON.FACING_NORTH
+  else:
+    return block.PISTON.FACING_EAST
+
+def _draw_block(position, *block_args):
+  minecraft.set_block(
+    position.x, position.y, position.z,
+    *block_args)
 
 
 # turtle = None
@@ -105,43 +133,44 @@ def begin():
 #   # TODO: check type
 #   turtle.trail = block_type
 
-# def _move(x,y,z):
-#   sleep(turtle.delay)
-#   a = turtle.position
-#   b = Position(x,y,z)
+def _move(x,y,z):
+  turtle = minecraft.turtle_session
+  sleep(turtle.delay)
+  a = turtle.position
+  b = Position(x,y,z)
 
-#   # imagine a transaction...
-#   minecraft.change_block_type(b.x,b.y,b.z,mcpi.block.GOLD_BLOCK)
-#   turtle.position = b
-
-#   minecraft.change_block_type(b.x,b.y,b.z,turtle.trail)
+  turtle.position = b
+  _draw_turtle()
+  _draw_block(a, *turtle.trail)
 
 
-# def move_relative(x_diff, y_diff, z_diff):
-#   _move(
-#       turtle.pos.x + x_diff,
-#       turtle.pos.y + y_diff,
-#       turtle.pos.z + z_diff)
+def _move_relative(x_diff, y_diff, z_diff):
+  turtle = minecraft.turtle_session
+  _move(
+      turtle.position.x + x_diff,
+      turtle.position.y + y_diff,
+      turtle.position.z + z_diff)
 
-# def forward():
-#   x_diff = 0
-#   y_diff = 0
-#   z_diff = 0
-#   if turtle.direction.yaw == 0:
-#       x_diff = 1
-#   elif turtle.direction.yaw == 90:
-#       z_diff = 1
-#   elif turtle.direction.yaw == 180:
-#       x_diff = -1
-#   else:
-#       z_diff = -1
+def forward():
+  turtle = minecraft.turtle_session
+  x_diff = 0
+  y_diff = 0
+  z_diff = 0
+  if turtle.direction.yaw == 0:
+    z_diff = 1
+  elif turtle.direction.yaw == 90:
+    x_diff = -1
+  elif turtle.direction.yaw == 180:
+    z_diff = -1
+  else:
+    x_diff = 1
 
-#   if turtle.direction.pitch == 0:
-#       y_diff = 1
-#   elif turtle.direction.pitch == 180:
-#       y_diff = -1
+  if turtle.direction.pitch == 0:
+    y_diff = 1
+  elif turtle.direction.pitch == 180:
+    y_diff = -1
 
-#   move_relative(x_diff, y_diff, z_diff)
+  _move_relative(x_diff, y_diff, z_diff)
 
 # def right(degrees):
 #   if (abs(degrees) not in [0, 90, 180, 270]):

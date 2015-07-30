@@ -1,3 +1,6 @@
+from mcgamedata import block
+from collections import namedtuple
+
 class Position():
   def __init__(self,x,y,z):
     self.x = x
@@ -20,7 +23,7 @@ class TurtleSession():
 class Minecraft():
   def __init__(self):
     self.mcpi_minecraft = None
-    self.player_name = None
+    self.player = None
     self.turtle_session = None
 
   def _m(self):
@@ -29,20 +32,62 @@ class Minecraft():
   # TODO: pass prepared functions to a runner and porentially all calls?
   # e.g. turn on stderr debugging with a simple method call... trace()
 
-  def change_block_type(self, x, y, z, block_type):
-    self._m().setBlock(x, y, z, block_type.id)
+  def set_block(self, x, y, z, gamedata_block, *gamedata_properties):
+    property_to_value = {}
+    for p in gamedata_properties:
+      p.add_to_dict(property_to_value)
+    self._m().setBlockV2(x, y, z, gamedata_block.name, **property_to_value)
+
+  def get_player_rotation_degrees(self):
+    return int(self._m().player.getRotation())
+
+  def get_player_tile_pos(self):
+    vec = self._m().player.getTilePos()
+    return Position(vec.x, vec.y, vec.z)
 
   def chat(self, message):
     self._m().postToChat(message)
 
 minecraft = Minecraft()
 
-def init(mcpi_minecraft, player_name=None):
+def init(mcpi_minecraft, player=None):
   minecraft.mcpi_minecraft = mcpi_minecraft
-  minecraft.player_name = player_name
+  minecraft.player = player
 
 def chat(message):
   minecraft.chat(message)
+
+def begin():
+  pos = minecraft.get_player_tile_pos()
+  rotation_degrees = minecraft.get_player_rotation_degrees()
+
+  # TODO: trig.
+  # dirty for now.
+
+  x_diff = 0
+  y_diff = 0
+  z_diff = 0
+  facing = None
+  if rotation_degrees >= 315 and rotation_degrees < 360 or \
+     rotation_degrees >= 0 and rotation_degrees < 45:
+    z_diff = 10 # south
+    facing = block.PISTON.FACING_SOUTH
+  elif rotation_degrees >= 45 and rotation_degrees < 135:
+    x_diff = -10
+    facing = block.PISTON.FACING_WEST
+  elif rotation_degrees >= 135 and rotation_degrees < 225:
+    z_diff = -10 # north
+    facing = block.PISTON.FACING_NORTH
+  else:
+    x_diff = 10
+    facing = block.PISTON.FACING_EAST
+
+  minecraft.set_block(
+    pos.x + x_diff,
+    pos.y + y_diff,
+    pos.z + z_diff,
+    block.PISTON, facing)
+
 
 # turtle = None
 

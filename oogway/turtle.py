@@ -24,7 +24,6 @@ class TurtleSession():
 class Minecraft():
   def __init__(self):
     self.mcpi_minecraft = None
-    self.player = None
 
   def _m(self):
     return self.mcpi_minecraft
@@ -52,7 +51,8 @@ minecraft = Minecraft()
 
 def init(mcpi_minecraft, player=None):
   minecraft.mcpi_minecraft = mcpi_minecraft
-  minecraft.player = player
+  if player:
+    minecraft.mcpi_minecraft.player.name = player
   minecraft.turtle_session = None
 
 def chat(message):

@@ -28,6 +28,7 @@ class TestTurtle(unittest.TestCase):
     chat("hi")
     begin()
     forward()
+    forward()
 
     # print mcpi_minecraft.player.getTilePos()
     # print mcpi_minecraft.player.getDirection()

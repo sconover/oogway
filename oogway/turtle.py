@@ -116,23 +116,6 @@ def _draw_block(position, *block_args):
     position.x, position.y, position.z,
     *block_args)
 
-
-# turtle = None
-
-# def begin(x=None, y=None, z=None, yaw_angle=None, pitch_angle=None):
-#   if x == None:
-    # use current player (facing away)
-    # fall back to facing away from first player
-    # fall back to 1, 100, 1
-
-  # turtle = TurtleSession()
-  # ...piston appears in front of player...facing the other direction...
-
-# TODO: this is replaced by pendown
-# def trail(block_type,*args,**kwargs):
-#   # TODO: check type
-#   turtle.trail = block_type
-
 def _move(x,y,z):
   turtle = minecraft.turtle_session
   sleep(turtle.delay)
@@ -156,7 +139,12 @@ def forward():
   x_diff = 0
   y_diff = 0
   z_diff = 0
-  if turtle.direction.yaw == 0:
+
+  if turtle.direction.pitch == 0:
+    y_diff = 1
+  elif turtle.direction.pitch == 180:
+    y_diff = -1
+  elif turtle.direction.yaw == 0:
     z_diff = 1
   elif turtle.direction.yaw == 90:
     x_diff = -1
@@ -165,36 +153,44 @@ def forward():
   else:
     x_diff = 1
 
-  if turtle.direction.pitch == 0:
-    y_diff = 1
-  elif turtle.direction.pitch == 180:
-    y_diff = -1
-
   _move_relative(x_diff, y_diff, z_diff)
 
-# def right(degrees):
-#   if (abs(degrees) not in [0, 90, 180, 270]):
-#       raise Exception("sorry, only 0, 90, 180, and 270 are allowed for now.")
+def pen_down(*block_args):
+  turtle = minecraft.turtle_session
+  turtle.trail = block_args
 
-#   turtle.direction.yaw += degrees
-#   if turtle.direction.yaw >= 360:
-#       turtle.direction.yaw = turtle.direction.yaw - 360
-#   elif turtle.direction.yaw < 0:
-#       turtle.direction.yaw = turtle.direction.yaw + 360
+# check(is(block.AIR))
+# check(is_not(block.AIR))
+#   is_not(block.AIR) ... predicate defs return curried functions
+# both, neither, either
+# ...good way to teach predicate logic
 
+def right(degrees):
+  turtle = minecraft.turtle_session
+  if (abs(degrees) not in [0, 90, 180, 270]):
+      raise Exception("sorry, only 0, 90, 180, and 270 are allowed for now.")
 
-# def left(degrees):
-#   right(-1 * degrees)
+  turtle.direction.yaw += degrees
+  if turtle.direction.yaw >= 360:
+      turtle.direction.yaw = turtle.direction.yaw - 360
+  elif turtle.direction.yaw < 0:
+      turtle.direction.yaw = turtle.direction.yaw + 360
+  _draw_turtle()
 
-# def up(degrees):
-#   if (abs(degrees) not in [0, 90, 180, 270]):
-#       raise Exception("sorry, only 0, 90, 180, and 270 are allowed for now.")
+def left(degrees):
+  right(-1 * degrees)
 
-#   turtle.direction.pitch -= degrees
-#   if turtle.direction.pitch >= 360:
-#       turtle.direction.pitch = turtle.direction.pitch - 360
-#   elif turtle.direction.pitch < 0:
-#       turtle.direction.pitch = turtle.direction.pitch + 360
+def up(degrees):
+  turtle = minecraft.turtle_session
+  if (abs(degrees) not in [0, 90, 180, 270]):
+      raise Exception("sorry, only 0, 90, 180, and 270 are allowed for now.")
 
-# def down(degrees):
-#   up(-1 * degrees)
+  turtle.direction.pitch -= degrees
+  if turtle.direction.pitch >= 360:
+      turtle.direction.pitch = turtle.direction.pitch - 360
+  elif turtle.direction.pitch < 0:
+      turtle.direction.pitch = turtle.direction.pitch + 360
+  _draw_turtle()
+
+def down(degrees):
+  up(-1 * degrees)

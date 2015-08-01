@@ -1,18 +1,8 @@
 from mcgamedata import block
 from collections import namedtuple
 from time import sleep
-
-class Position():
-  def __init__(self,x,y,z):
-    self.x = x
-    self.y = y
-    self.z = z
-
-class Direction():
-  def __init__(self,yaw,pitch,roll):
-    self.yaw = yaw
-    self.pitch = pitch
-    self.roll = roll
+from raster import calculate_increment_3d
+from orientation import Position, Direction
 
 class TurtleSession():
   def __init__(self, position, direction):
@@ -151,23 +141,7 @@ def _move_relative(x_diff, y_diff, z_diff):
 
 def forward():
   turtle = minecraft.turtle_session
-  x_diff = 0
-  y_diff = 0
-  z_diff = 0
-
-  if turtle.direction.pitch == 0:
-    y_diff = 1
-  elif turtle.direction.pitch == 180:
-    y_diff = -1
-  elif turtle.direction.yaw == 0:
-    z_diff = 1
-  elif turtle.direction.yaw == 90:
-    x_diff = -1
-  elif turtle.direction.yaw == 180:
-    z_diff = -1
-  else:
-    x_diff = 1
-
+  x_diff, y_diff, z_diff = calculate_increment_3d(turtle.position, turtle.direction)
   _move_relative(x_diff, y_diff, z_diff)
 
 def pen_down(*block_args):
@@ -182,8 +156,6 @@ def pen_down(*block_args):
 
 def right(degrees):
   turtle = minecraft.turtle_session
-  if (abs(degrees) not in [0, 90, 180, 270]):
-      raise Exception("sorry, only 0, 90, 180, and 270 are allowed for now.")
 
   turtle.direction.yaw += degrees
   if turtle.direction.yaw >= 360:
@@ -197,8 +169,6 @@ def left(degrees):
 
 def up(degrees):
   turtle = minecraft.turtle_session
-  if (abs(degrees) not in [0, 90, 180, 270]):
-      raise Exception("sorry, only 0, 90, 180, and 270 are allowed for now.")
 
   turtle.direction.pitch -= degrees
   if turtle.direction.pitch >= 360:

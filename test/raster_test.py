@@ -8,7 +8,7 @@ sys.path.append(turtle_path)
 
 import unittest
 from oogway.raster import calculate_increment_2d, calculate_increment_3d
-
+from oogway.orientation import Position, Direction
 
 class TestRaster(unittest.TestCase):
   def test_calculate_diffs_angle_23(self):
@@ -217,44 +217,69 @@ class TestRaster(unittest.TestCase):
     absolute_y_pos = 103
     self.assertEqual((-1, 1), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
 
+  def test_round_numbers(self):
+    absolute_x_pos = 100
+    absolute_y_pos = 100
+
+    angle = 0
+    self.assertEqual((0, 1), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
+
+    angle = 45
+    self.assertEqual((1, 1), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
+
+    angle = 90
+    self.assertEqual((1, 0), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
+
+    angle = 135
+    self.assertEqual((1, -1), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
+
+    angle = 180
+    self.assertEqual((0, -1), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
+
+    angle = 225
+    self.assertEqual((-1, -1), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
+
+    angle = 270
+    self.assertEqual((-1, 0), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
+
+    angle = 270
+    self.assertEqual((-1, 0), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
+
+    angle = 360
+    self.assertEqual((0, 1), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
+
 
   def test_calculate_3d_angle_all_45(self):
     yaw_angle = 45
     pitch_angle = 45
 
-    absolute_x_pos = 100
-    absolute_y_pos = 100
-    absolute_z_pos = 100
-    self.assertEqual((1, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+    position = Position(100, 100, 100)
+    direction = Direction(yaw_angle, pitch_angle, 0)
+    self.assertEqual((1, 1, 1), calculate_increment_3d(position, direction))
 
-    absolute_x_pos = 101
-    absolute_y_pos = 102
-    absolute_z_pos = 103
-    self.assertEqual((1, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+    position = Position(101, 101, 101)
+    direction = Direction(yaw_angle, pitch_angle, 0)
+    self.assertEqual((1, 1, 1), calculate_increment_3d(position, direction))
 
   def test_calculate_3d_angle_all_23(self):
     yaw_angle = 23
     pitch_angle = 23
 
-    absolute_x_pos = 100
-    absolute_y_pos = 100
-    absolute_z_pos = 100
-    self.assertEqual((0, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+    position = Position(100, 100, 100)
+    direction = Direction(yaw_angle, pitch_angle, 0)
+    self.assertEqual((0, 1, 1), calculate_increment_3d(position, direction))
 
-    absolute_x_pos = 100
-    absolute_y_pos = 101
-    absolute_z_pos = 101
-    self.assertEqual((1, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+    position = Position(100, 101, 101)
+    direction = Direction(yaw_angle, pitch_angle, 0)
+    self.assertEqual((1, 1, 1), calculate_increment_3d(position, direction))
 
-    absolute_x_pos = 101
-    absolute_y_pos = 102
-    absolute_z_pos = 102
-    self.assertEqual((0, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+    position = Position(101, 102, 102)
+    direction = Direction(yaw_angle, pitch_angle, 0)
+    self.assertEqual((0, 1, 1), calculate_increment_3d(position, direction))
 
-    absolute_x_pos = 101
-    absolute_y_pos = 103
-    absolute_z_pos = 103
-    self.assertEqual((1, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+    position = Position(101, 103, 103)
+    direction = Direction(yaw_angle, pitch_angle, 0)
+    self.assertEqual((1, 1, 1), calculate_increment_3d(position, direction))
 
 if __name__ == '__main__':
     unittest.main()

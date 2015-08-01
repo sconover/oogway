@@ -13,7 +13,8 @@ sys.path.append(turtle_path)
 import unittest
 import mcpi.minecraft
 import mcpi
-from oogway.turtle import init, chat, begin, forward
+from oogway.turtle import init, chat, begin, forward, up, right, pen_down
+from mcgamedata import block
 
 
 class TestTurtle(unittest.TestCase):
@@ -30,8 +31,12 @@ class TestTurtle(unittest.TestCase):
     init(connect, "papadapadapa")
     chat("hi")
     begin()
+    pen_down(block.GOLD_BLOCK)
     forward()
     forward()
+    for i in xrange(100):
+        up(5)
+        forward()
 
     # print mcpi_minecraft.player.getTilePos()
     # print mcpi_minecraft.player.getDirection()

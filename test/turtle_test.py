@@ -15,16 +15,19 @@ import mcpi.minecraft
 import mcpi
 from oogway.turtle import init, chat, begin, forward
 
+
 class TestTurtle(unittest.TestCase):
   def test_basic(self):
-    mcpi_minecraft = mcpi.minecraft.Minecraft.create(name="papadapadapa")
+    def connect():
+        return mcpi.minecraft.Minecraft.create()
+
     # mcpi_minecraft.setBlockV2(1, 120, 1, block.STONE.name, variant=block.STONE.VARIANT_ANDESITE.value)
     # mcpi_minecraft.setBlockV2(1, 127, 1, block.STONE.name, block.STONE.VARIANT_ANDESITE)
     # mcpi_minecraft.setBlockV2(1, 130, 1, block.PISTON.name, block.PISTON.FACING_DOWN)
 
     # mcpi_minecraft.setBlockV2(1, 101, 1, block.DIRT.name)
     # mcpi_minecraft.setBlockV2(1, 102, 1, block.CACTUS.name, block.CACTUS.AGE_15)
-    init(mcpi_minecraft, "papadapadapa")
+    init(connect, "papadapadapa")
     chat("hi")
     begin()
     forward()

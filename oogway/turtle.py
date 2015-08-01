@@ -23,12 +23,24 @@ class TurtleSession():
 
 class Minecraft():
   def __init__(self):
-    self.mcpi_minecraft = None
+    self.mcpi_minecraft_connect_function = None
+    self.player_name = None
+    self._mcpi_minecraft = None
 
   def _m(self):
-    return self.mcpi_minecraft
+    if self._mcpi_minecraft == None:
+      self._mcpi_minecraft = self.mcpi_minecraft_connect_function()
+      self._mcpi_minecraft.player.name = self.player_name
+    return self._mcpi_minecraft
 
-  # TODO: pass prepared functions to a runner and porentially all calls?
+  def reconnect(self):
+    self._mcpi_minecraft = None
+    self._m()
+
+  def is_connected(self):
+    return self._mcpi_minecraft != None
+
+  # TODO: pass prepared functions to a runner and potentially all calls?
   # e.g. turn on stderr debugging with a simple method call... trace()
 
   def set_block(self, x, y, z, gamedata_block, *gamedata_properties):
@@ -49,10 +61,13 @@ class Minecraft():
 
 minecraft = Minecraft()
 
-def init(mcpi_minecraft, player=None):
-  minecraft.mcpi_minecraft = mcpi_minecraft
+def init(mcpi_minecraft_connect_function, player=None):
+  minecraft.mcpi_minecraft_connect_function = mcpi_minecraft_connect_function
   if player:
-    minecraft.mcpi_minecraft.player.name = player
+    minecraft.player_name = player
+  if minecraft.is_connected():
+    minecraft.reconnect()
+
   minecraft.turtle_session = None
 
 def chat(message):

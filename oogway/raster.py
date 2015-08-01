@@ -1,5 +1,22 @@
 import math
 
+def calculate_increment_3d(absolute_position, yaw_angle_in_degrees, pitch_angle_in_degrees, move_distance=1):
+  absolute_x = absolute_position[0]
+  absolute_y = absolute_position[1]
+  absolute_z = absolute_position[2]
+
+  # pitch: xy plane
+  # yaw: xz plane
+
+  xy_diff = calculate_increment_2d((absolute_x, absolute_y), pitch_angle_in_degrees, move_distance)
+  xz_diff = calculate_increment_2d((absolute_x, absolute_z), yaw_angle_in_degrees, move_distance)
+
+  x_diff = max(xy_diff[0], xz_diff[0])
+  y_diff = xy_diff[1]
+  z_diff = xz_diff[1]
+
+  return (x_diff, y_diff, z_diff)
+
 def calculate_increment_2d(absolute_position, angle_in_degrees, move_distance=1):
   absolute_x = absolute_position[0]
   absolute_y = absolute_position[1]

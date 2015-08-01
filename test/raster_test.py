@@ -7,7 +7,7 @@ turtle_path = os.path.join(this_dir, "../")
 sys.path.append(turtle_path)
 
 import unittest
-from oogway.raster import calculate_increment_2d
+from oogway.raster import calculate_increment_2d, calculate_increment_3d
 
 
 class TestRaster(unittest.TestCase):
@@ -218,6 +218,43 @@ class TestRaster(unittest.TestCase):
     self.assertEqual((-1, 1), calculate_increment_2d((absolute_x_pos, absolute_y_pos), angle))
 
 
+  def test_calculate_3d_angle_all_45(self):
+    yaw_angle = 45
+    pitch_angle = 45
+
+    absolute_x_pos = 100
+    absolute_y_pos = 100
+    absolute_z_pos = 100
+    self.assertEqual((1, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+
+    absolute_x_pos = 101
+    absolute_y_pos = 102
+    absolute_z_pos = 103
+    self.assertEqual((1, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+
+  def test_calculate_3d_angle_all_23(self):
+    yaw_angle = 23
+    pitch_angle = 23
+
+    absolute_x_pos = 100
+    absolute_y_pos = 100
+    absolute_z_pos = 100
+    self.assertEqual((0, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+
+    absolute_x_pos = 100
+    absolute_y_pos = 101
+    absolute_z_pos = 101
+    self.assertEqual((1, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+
+    absolute_x_pos = 101
+    absolute_y_pos = 102
+    absolute_z_pos = 102
+    self.assertEqual((0, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
+
+    absolute_x_pos = 101
+    absolute_y_pos = 103
+    absolute_z_pos = 103
+    self.assertEqual((1, 1, 1), calculate_increment_3d((absolute_x_pos, absolute_y_pos, absolute_z_pos), yaw_angle, pitch_angle))
 
 if __name__ == '__main__':
     unittest.main()

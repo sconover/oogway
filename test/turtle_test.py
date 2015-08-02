@@ -13,7 +13,7 @@ sys.path.append(turtle_path)
 import unittest
 import mcpi.minecraft
 import mcpi
-from oogway.turtle import init, chat, begin, forward, up, right, pen_down
+from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down, delay, down
 from mcgamedata import block
 
 
@@ -32,12 +32,152 @@ class TestTurtle(unittest.TestCase):
     chat("hi")
     begin()
     pen_down(block.GOLD_BLOCK)
-    forward()
-    forward()
-    for i in xrange(100):
-        up(5)
-        forward()
+    # forward()
+    # forward()
+    # forward()
+    # forward()
 
+    # up(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # down(45)
+    # right(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # up(45)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+    # down(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # up(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # right(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # left(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # down(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # left(45)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # right(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+    # for i in xrange(10):
+    #     forward()
+
+    # right(90)
+    # for i in xrange(10):
+    #     forward()
+
+    # up(30)
+    delay(0)
+
+    def poly(sides, side_length):
+        degrees = 360/sides
+        for i in xrange(sides):
+            right(degrees)
+            for j in xrange(side_length):
+                forward()
+    # # # delay(0.1)
+    # delay(0)
+
+    # down(30)
+
+    def cylinder(height):
+        for i in xrange(height):
+            poly(30, 3)
+            up(90)
+            forward()
+            down(90)
+
+    # cylinder(40)
+
+    def square(side):
+        for i in range(0, side, -1):
+            poly(4, i)
+            left(90)
+            forward()
+            right(90)
+
+    # square(8)
+    def square(side):
+        for i in range(side, 1, -1):
+            poly(4, i)
+            right(90)
+            forward()
+            right(90)
+            forward()
+            left(180)
+
+
+
+    def cube(side):
+        for i in xrange(side):
+            square(side)
+            up(90)
+            forward()
+            down(90)
+            right(90)
+            forward()
+            right(90)
+            forward()
+            left(90)
+
+    cube(5)
+    # for i in xrange(8):
+    #     if i % 2 == 0:
+    #         up(60)
+    #     else:
+    #         down(60)
+    #     poly(8, 5)
+    #     poly(8, 5)
+    #     poly(8, 5)
+    #     right(45)
+
+    # repeat = 12
+    # for i in xrange(repeat):
+    #     poly(6, 10)
+    #     down(360/repeat)
+
+
+    # step_size = 5
+    # for i in xrange(360/step_size):
+    #     up(step_size)
+    #     forward()
     # print mcpi_minecraft.player.getTilePos()
     # print mcpi_minecraft.player.getDirection()
     # print mcpi_minecraft.player.getRotation()

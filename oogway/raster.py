@@ -1,100 +1,97 @@
-import math
+from math import sin, cos, radians, tan
+from orientation import Position
 
-def calculate_increment_3d(position, direction, move_distance=1):
-  # pitch: xy plane
-  # yaw: xz plane
-  xy_diff = calculate_increment_2d((position.x, position.y), direction.pitch, move_distance)
-  xz_diff = calculate_increment_2d((position.x, position.z), direction.yaw, move_distance)
+# note: https://bukkit.org/threads/tutorial-how-to-calculate-vectors.138849/
 
-  x_diff = max(xy_diff[0], xz_diff[0])
-  y_diff = xy_diff[1]
-  z_diff = xz_diff[1]
+def calculate_point_on_sphere(direction, radius):
 
-  return (x_diff, y_diff, z_diff)
+    # from link above:
+    # "The "+ 90" adds 90 degrees to the players pitch/yaw which corrects
+    # for the 90 degree rotation Notch added."
 
-def calculate_increment_2d(absolute_position, angle_in_degrees, move_distance=1):
-  absolute_x = absolute_position[0]
-  absolute_y = absolute_position[1]
+    # yaw is the angle around the z axis, aka phi
+    yaw_radians = radians(direction.yaw)
 
-  if angle_in_degrees == 0:
-    return (0, move_distance)
-  elif angle_in_degrees <= 45:
-    adjacent = move_distance
-    opposite = math.tan(math.radians(angle_in_degrees)) / adjacent
-    total_steps_before_increment = int(move_distance / opposite)
+    # pitch is the angle around the y axis, aka theta
+    pitch_radians = radians(direction.pitch)
 
-    if absolute_y % total_steps_before_increment == total_steps_before_increment - 1:
-      return (move_distance, move_distance)
-    else:
-      return (0, move_distance)
-  elif angle_in_degrees < 90:
-    adjacent = move_distance
-    opposite = math.tan(math.radians(90 - angle_in_degrees)) / adjacent
-    total_steps_before_increment = int(move_distance / opposite)
 
-    if absolute_x % total_steps_before_increment == total_steps_before_increment - 1:
-      return (move_distance, move_distance)
-    else:
-      return (move_distance, 0)
-  elif angle_in_degrees == 90:
-    return (move_distance, 0)
-  elif angle_in_degrees <= 135:
-    adjacent = move_distance
-    opposite = math.tan(math.radians(angle_in_degrees - 90)) / adjacent
-    total_steps_before_increment = int(move_distance / opposite)
 
-    if absolute_x % total_steps_before_increment == total_steps_before_increment - 1:
-      return (move_distance, -1 * move_distance)
-    else:
-      return (move_distance, 0)
-  elif angle_in_degrees < 180:
-    adjacent = move_distance
-    opposite = math.tan(math.radians(180 - angle_in_degrees)) / adjacent
-    total_steps_before_increment = int(move_distance / opposite)
+    # print "yaw_radians=" + str(yaw_radians) + " pitch_radians=" + str(pitch_radians)
 
-    if absolute_y % total_steps_before_increment == total_steps_before_increment - 1:
-      return (move_distance, -1 * move_distance)
-    else:
-      return (0, -1 * move_distance)
-  elif angle_in_degrees == 180:
-    return (0, -1 * move_distance)
-  elif angle_in_degrees <= 225:
-    adjacent = move_distance
-    opposite = math.tan(math.radians(angle_in_degrees - 180)) / adjacent
-    total_steps_before_increment = int(move_distance / opposite)
+    # print "sin(pitch_radians)=" + str(sin(pitch_radians)) + \
+    #  "cos(yaw_radians)=" + str(cos(yaw_radians))
+    # x = radius * sin(pitch_radians) * cos(yaw_radians)
+    # y = radius * sin(pitch_radians) * sin(yaw_radians)
+    # z = radius * cos(pitch_radians)
 
-    if absolute_y % total_steps_before_increment == total_steps_before_increment - 1:
-      return (-1 * move_distance, -1 * move_distance)
-    else:
-      return (0, -1 * move_distance)
-  elif angle_in_degrees < 270:
-    adjacent = move_distance
-    opposite = math.tan(math.radians(270 - angle_in_degrees)) / adjacent
-    total_steps_before_increment = int(move_distance / opposite)
+    # y = radius * sin(pitch_radians)
+    # x = radius * cos(pitch_radians) * sin(yaw_radians)
+    # z = radius * cos(yaw_radians)
 
-    if absolute_x % total_steps_before_increment == total_steps_before_increment - 1:
-      return (-1 * move_distance, -1 * move_distance)
-    else:
-      return (-1 * move_distance, 0)
-  elif angle_in_degrees == 270:
-    return (-1 * move_distance, 0)
-  elif angle_in_degrees <= 315:
-    adjacent = move_distance
-    opposite = math.tan(math.radians(angle_in_degrees - 270)) / adjacent
-    total_steps_before_increment = int(move_distance / opposite)
 
-    if absolute_x % total_steps_before_increment == total_steps_before_increment - 1:
-      return (-1 * move_distance, move_distance)
-    else:
-      return (-1 * move_distance, 0)
-  elif angle_in_degrees < 360:
-    adjacent = move_distance
-    opposite = math.tan(math.radians(360 - angle_in_degrees)) / adjacent
-    total_steps_before_increment = int(move_distance / opposite)
+    # print "cos(pitch_radians)=" + str(cos(pitch_radians)) + " sin(yaw_radians)=" + str(sin(yaw_radians))
+    # print "sin(pitch_radians)=" + str(sin(pitch_radians))
+    # print "cos(pitch_radians)=" + str(cos(pitch_radians)) + " cos(yaw_radians)=" + str(cos(yaw_radians))
 
-    if absolute_y % total_steps_before_increment == total_steps_before_increment - 1:
-      return (-1 * move_distance, move_distance)
-    else:
-      return (0, move_distance)
-  elif angle_in_degrees == 360:
-    return (0, move_distance)
+    x = radius * -1 * cos(pitch_radians) * sin(yaw_radians)
+    y = radius * -1 * sin(pitch_radians)
+    z = radius * cos(pitch_radians) * cos(yaw_radians)
+
+    return Position(x, y, z)
+
+
+    # public static Vector3d createDirectionRad(double theta, double phi) {
+    #     final double f = TrigMath.sin(phi);
+    #     return new Vector3d(f * TrigMath.cos(theta), f * TrigMath.sin(theta), TrigMath.cos(phi));
+    # }
+
+
+    # public Vector getDirection() {
+    #     Vector vector = new Vector();
+
+    #     double rotX = this.getYaw();
+    #     double rotY = this.getPitch();
+
+    #     vector.setY(-Math.sin(Math.toRadians(rotY)));
+
+    #     double xz = Math.cos(Math.toRadians(rotY));
+
+    #     vector.setX(-xz * Math.sin(Math.toRadians(rotX)));
+    #     vector.setZ(xz * Math.cos(Math.toRadians(rotX)));
+
+    #     return vector;
+    # }
+
+# /**
+#      * Sets the {@link #getYaw() yaw} and {@link #getPitch() pitch} to point
+#      * in the direction of the vector.
+#      */
+#     public Location setDirection(Vector vector) {
+#         /*
+#          * Sin = Opp / Hyp
+#          * Cos = Adj / Hyp
+#          * Tan = Opp / Adj
+#          *
+#          * x = -Opp
+#          * z = Adj
+#          */
+#         final double _2PI = 2 * Math.PI;
+#         final double x = vector.getX();
+#         final double z = vector.getZ();
+
+#         if (x == 0 && z == 0) {
+#             pitch = vector.getY() > 0 ? -90 : 90;
+#             return this;
+#         }
+
+#         double theta = Math.atan2(-x, z);
+#         yaw = (float) Math.toDegrees((theta + _2PI) % _2PI);
+
+#         double x2 = NumberConversions.square(x);
+#         double z2 = NumberConversions.square(z);
+#         double xz = Math.sqrt(x2 + z2);
+#         pitch = (float) Math.toDegrees(Math.atan(-vector.getY() / xz));
+
+#         return this;
+#     }

@@ -1,7 +1,7 @@
 from mcgamedata import block
 from collections import namedtuple
 from time import sleep
-from raster import calculate_increment_3d
+from raster import calculate_point_on_sphere
 from orientation import Position, Direction
 
 class TurtleSession():
@@ -37,7 +37,9 @@ class Minecraft():
     property_to_value = {}
     for p in gamedata_properties:
       p.add_to_dict(property_to_value)
-    self._m().setBlockV2(x, y, z, gamedata_block.name, **property_to_value)
+    # cast to int. we're mapping a continuous space of very high precision,
+    # on to a grid.
+    self._m().setBlockV2(int(x), int(y), int(z), gamedata_block.name, **property_to_value)
 
   def get_player_rotation_degrees(self):
     return int(self._m().player.getRotation())
@@ -67,36 +69,28 @@ def begin():
   pos = minecraft.get_player_tile_pos()
   rotation_degrees = minecraft.get_player_rotation_degrees()
 
-  # TODO: trig.
-  # dirty for now.
-
-  x_diff = 0
-  y_diff = 0
-  z_diff = 0
   facing = None
   yaw = None
   if rotation_degrees >= 315 and rotation_degrees < 360 or \
      rotation_degrees >= 0 and rotation_degrees < 45:
-    z_diff = 10 # south
     facing = block.PISTON.FACING_SOUTH
     yaw = 0
   elif rotation_degrees >= 45 and rotation_degrees < 135:
-    x_diff = -10
     facing = block.PISTON.FACING_WEST
     yaw = 90
   elif rotation_degrees >= 135 and rotation_degrees < 225:
-    z_diff = -10 # north
     facing = block.PISTON.FACING_NORTH
     yaw = 180
   else:
-    x_diff = 10
     facing = block.PISTON.FACING_EAST
     yaw = 270
 
-  start_x = pos.x + x_diff
-  start_y = pos.y + y_diff
-  start_z = pos.z + z_diff
-  minecraft.turtle_session = TurtleSession(Position(start_x, start_y, start_z), Direction(yaw, 90, 0))
+  position_diff = calculate_point_on_sphere(direction=Direction(yaw, 0, 0), radius=5)
+
+  start_x = pos.x + position_diff.x
+  start_y = pos.y + position_diff.y
+  start_z = pos.z + position_diff.z
+  minecraft.turtle_session = TurtleSession(Position(start_x, start_y, start_z), Direction(yaw, 0, 0))
   _draw_turtle()
 
 def _draw_turtle():
@@ -128,8 +122,8 @@ def _move(x,y,z):
   b = Position(x,y,z)
 
   turtle.position = b
-  _draw_turtle()
   _draw_block(a, *turtle.trail)
+  _draw_turtle()
 
 
 def _move_relative(x_diff, y_diff, z_diff):
@@ -139,10 +133,15 @@ def _move_relative(x_diff, y_diff, z_diff):
       turtle.position.y + y_diff,
       turtle.position.z + z_diff)
 
+def delay(seconds):
+  minecraft.turtle_session.delay = seconds
+
 def forward():
   turtle = minecraft.turtle_session
-  x_diff, y_diff, z_diff = calculate_increment_3d(turtle.position, turtle.direction)
-  _move_relative(x_diff, y_diff, z_diff)
+  # print turtle.direction
+  position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
+  # print position_diff
+  _move_relative(position_diff.x, position_diff.y, position_diff.z)
 
 def pen_down(*block_args):
   turtle = minecraft.turtle_session

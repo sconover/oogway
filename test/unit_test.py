@@ -11,15 +11,15 @@ from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down,
 from mcgamedata import block
 
 class Vector():
-  def __init__(self):
-    self.x = 1
-    self.y = 1
-    self.z = 1
+  def __init__(self, x, y, z):
+    self.x = x
+    self.y = y
+    self.z = z
 
 class FakeMcpiPlayer():
-  def __init__(self):
-    self.tile_pos = Vector()
-    self.rotation = 90
+  def __init__(self, rotation, tile_pos):
+    self.rotation = rotation
+    self.tile_pos = tile_pos
 
   def getRotation(self):
     return self.rotation
@@ -28,8 +28,8 @@ class FakeMcpiPlayer():
     return self.tile_pos
 
 class FakeMcpi():
-  def __init__(self):
-    self.player = FakeMcpiPlayer()
+  def __init__(self, player):
+    self.player = player
     self.chat_log = []
 
   def setBlockV2(self, x, y, z, block_type_name, property_to_value):
@@ -40,7 +40,7 @@ class FakeMcpi():
 
 class TestUnit(unittest.TestCase):
   def setUp(self):
-    game = FakeMcpi()
+    game = FakeMcpi(FakeMcpiPlayer(90, Vector(1,1,1)))
 
     def connect():
       return game
@@ -48,12 +48,11 @@ class TestUnit(unittest.TestCase):
     self.game = game
     self.connect = connect
 
-  def test_chat(self):
-
     init(self.connect, "papadapadapa")
+
+  def test_chat(self):
     chat("hi")
     chat("there")
-
     self.assertEqual(["hi", "there"], self.game.chat_log)
 
 if __name__ == '__main__':

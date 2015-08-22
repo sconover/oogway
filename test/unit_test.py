@@ -39,17 +39,22 @@ class FakeMcpi():
     self.chat_log.append(message)
 
 class TestUnit(unittest.TestCase):
-  def test_basic(self):
+  def setUp(self):
     game = FakeMcpi()
 
     def connect():
       return game
 
-    init(connect, "papadapadapa")
+    self.game = game
+    self.connect = connect
+
+  def test_chat(self):
+
+    init(self.connect, "papadapadapa")
     chat("hi")
     chat("there")
 
-    self.assertEqual(["hi", "there"], game.chat_log)
+    self.assertEqual(["hi", "there"], self.game.chat_log)
 
 if __name__ == '__main__':
     unittest.main()

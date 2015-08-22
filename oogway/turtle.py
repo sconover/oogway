@@ -65,7 +65,7 @@ def init(mcpi_minecraft_connect_function, player=None):
 def chat(message):
   minecraft.chat(message)
 
-def begin():
+def begin(start_distance_from_player=5):
   pos = minecraft.get_player_tile_pos()
   rotation_degrees = minecraft.get_player_rotation_degrees()
 
@@ -85,7 +85,7 @@ def begin():
     facing = block.PISTON.FACING_EAST
     yaw = 270
 
-  position_diff = calculate_point_on_sphere(direction=Direction(yaw, 0, 0), radius=5)
+  position_diff = calculate_point_on_sphere(direction=Direction(yaw, 0, 0), radius=start_distance_from_player)
 
   start_x = pos.x + position_diff.x
   start_y = pos.y + position_diff.y

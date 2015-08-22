@@ -51,7 +51,7 @@ def calculate_point_on_sphere(direction, radius):
         ["sin(pr)", sin(pitch_radians)],
         ["cos(yr)", cos(yaw_radians)]]
 
-    print " ".join(map(lambda (k,v): k + "=" + str(round(v,4)).ljust(6), parts))
+    # print " ".join(map(lambda (k,v): k + "=" + str(round(v,4)).ljust(6), parts))
 
     return Position(x, y, z)
 

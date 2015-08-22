@@ -1,7 +1,7 @@
 from mcgamedata import block
 from collections import namedtuple
 from time import sleep
-from raster import calculate_point_on_sphere
+from sphere_math import calculate_point_on_sphere
 from orientation import Position, Direction
 
 class TurtleSession():

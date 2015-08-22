@@ -30,26 +30,70 @@ class TestTurtle(unittest.TestCase):
     # mcpi_minecraft.setBlockV2(1, 102, 1, block.CACTUS.name, block.CACTUS.AGE_15)
     init(connect, "papadapadapa")
     chat("hi")
+    # begin()
+    # pen_down(block.GOLD_BLOCK)
+
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # up(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
+    # down(90)
+    # right(90)
+    # forward()
+    # forward()
+    # forward()
+    # forward()
+
     begin()
     pen_down(block.GOLD_BLOCK)
 
-    forward()
-    forward()
+    # forward()
+    # forward()
+
+    # right(90)
+    # forward()
+    # forward()
+
+    # up(90)
+    # forward()
+    # forward()
+
+
+
+    # forward()
+    # forward()
+
+    # up(90)
+    # forward()
+    # forward()
+
+    # right(90) # turtle does not actually turn, keeps going up
+    # forward()
+    # forward()
+
+
     forward()
     forward()
 
     up(90)
     forward()
     forward()
+
+    down(90) # cancels out the up
+    right(90) # turtle turns right
     forward()
     forward()
 
-    down(90)
-    right(90)
-    forward()
-    forward()
-    forward()
-    forward()
+
+    # start_task(living.OCELOT.SIT)
+    # reset_task(living.OCELOT.SIT)
 
     # up(45)
     # forward()

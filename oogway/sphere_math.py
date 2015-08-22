@@ -38,6 +38,21 @@ def calculate_point_on_sphere(direction, radius):
     y = radius * -1 * sin(pitch_radians)
     z = radius * cos(pitch_radians) * cos(yaw_radians)
 
+    parts = [
+        ["x", x],
+        ["y", y],
+        ["z", z],
+        ["yaw", direction.yaw],
+        ["yr", yaw_radians],
+        ["pitch", direction.pitch],
+        ["pr", pitch_radians],
+        ["cos(pr)", cos(pitch_radians)],
+        ["sin(yr)", sin(yaw_radians)],
+        ["sin(pr)", sin(pitch_radians)],
+        ["cos(yr)", cos(yaw_radians)]]
+
+    print " ".join(map(lambda (k,v): k + "=" + str(round(v,4)).ljust(6), parts))
+
     return Position(x, y, z)
 
 

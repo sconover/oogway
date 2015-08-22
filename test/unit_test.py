@@ -201,8 +201,79 @@ class TestUnit(unittest.TestCase):
       (1,-1,7): ("piston", {"facing":"down"})
     }, self.game.tiles)
 
-# todo...math bug - maybe it's pitch=270??
+  def test_turns_and_piston_facing(self):
+    self.begin_for_testing()
+    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    right(30)
+    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    right(30) # yaw 60
+    self.assertEqual({(1,1,6): ("piston", {"facing":"west"})}, self.game.tiles)
+    right(30) # yaw 90 - due west
+    self.assertEqual({(1,1,6): ("piston", {"facing":"west"})}, self.game.tiles)
+    right(30) # yaw 120
+    self.assertEqual({(1,1,6): ("piston", {"facing":"west"})}, self.game.tiles)
+    right(30) # yaw 150
+    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
+    right(30) # yaw 180 - due north
+    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
+    right(30) # yaw 210
+    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
+    right(30) # yaw 240
+    self.assertEqual({(1,1,6): ("piston", {"facing":"east"})}, self.game.tiles)
+    right(30) # yaw 270 - due east
+    self.assertEqual({(1,1,6): ("piston", {"facing":"east"})}, self.game.tiles)
+    right(30) # yaw 300
+    self.assertEqual({(1,1,6): ("piston", {"facing":"east"})}, self.game.tiles)
+    right(30) # yaw 330
+    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    right(30) # yaw 360
+    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
 
+    # pitch in minecraft is weird. 0 is the horizon, -90 is straight up, 90 is straight down
+    # see https://bukkit.org/threads/tutorial-how-to-calculate-vectors.138849/
+    up(30) # pitch -30
+    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    up(30) # pitch -60
+    self.assertEqual({(1,1,6): ("piston", {"facing":"up"})}, self.game.tiles)
+    up(30) # pitch -90 - straight up
+    self.assertEqual({(1,1,6): ("piston", {"facing":"up"})}, self.game.tiles)
+    up(30) # pitch -120
+    self.assertEqual({(1,1,6): ("piston", {"facing":"up"})}, self.game.tiles)
+    up(30) # pitch -150
+    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
+    up(30) # pitch -180
+    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
+    up(30) # pitch 150
+    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
+    up(30) # pitch 120
+    self.assertEqual({(1,1,6): ("piston", {"facing":"down"})}, self.game.tiles)
+    up(30) # pitch 90 - straight down
+    self.assertEqual({(1,1,6): ("piston", {"facing":"down"})}, self.game.tiles)
+    up(30) # pitch 60
+    self.assertEqual({(1,1,6): ("piston", {"facing":"down"})}, self.game.tiles)
+    up(30) # pitch 30
+    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    up(30) # pitch 0
+    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+
+  def test_turn_22_degrees(self):
+    self.begin_for_testing()
+    left(22)
+    forward()
+    forward()
+    forward()
+    forward()
+    forward()
+    forward()
+
+    self.assertEqual({
+      (1,1,6):  "gold_block",
+      (1,1,7):  "gold_block",
+      (2,1,8):  "gold_block",
+      (2,1,9):  "gold_block",
+      (2,1,10): "gold_block",
+      (3,1,11): ("piston", {"facing":"south"})
+    }, self.game.tiles)
 
   def test_pen_down_pen_up(self):
     self.begin_for_testing()

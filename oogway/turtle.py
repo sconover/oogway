@@ -105,25 +105,61 @@ def _draw_turtle():
     block.PISTON, _turtle_facing())
 
 # TODO: this needs to take into account yaw/pitch not on right angles
+def _facing_based_on_yaw():
+  turtle = minecraft.turtle_session
+
+  facing = block.PISTON.FACING_SOUTH
+  if turtle.direction.yaw >= 45:
+    facing = block.PISTON.FACING_WEST
+  if turtle.direction.yaw >= 135:
+    facing = block.PISTON.FACING_NORTH
+  if turtle.direction.yaw >= 225:
+    facing = block.PISTON.FACING_EAST
+  if turtle.direction.yaw >= 315:
+    facing = block.PISTON.FACING_SOUTH
+
+  return facing
+
+def _opposite_facing(facing):
+  if facing == block.PISTON.FACING_SOUTH:
+    return block.PISTON.FACING_NORTH
+  if facing == block.PISTON.FACING_NORTH:
+    return block.PISTON.FACING_SOUTH
+
+  if facing == block.PISTON.FACING_EAST:
+    return block.PISTON.FACING_WEST
+  if facing == block.PISTON.FACING_WEST:
+    return block.PISTON.FACING_EAST
+
+  if facing == block.PISTON.FACING_DOWN:
+    return block.PISTON.FACING_UP
+  if facing == block.PISTON.FACING_UP:
+    return block.PISTON.FACING_DOWN
+
 def _turtle_facing():
   turtle = minecraft.turtle_session
 
   # see https://bukkit.org/threads/tutorial-how-to-calculate-vectors.138849/
   # for notes on minecraft quirks
 
-  if turtle.direction.pitch == -90:
-    return block.PISTON.FACING_UP
-  elif turtle.direction.pitch == 90:
-    return block.PISTON.FACING_DOWN
+  facing_from_yaw = _facing_based_on_yaw()
+  facing = facing_from_yaw
 
-  if turtle.direction.yaw == 0:
-    return block.PISTON.FACING_SOUTH
-  elif turtle.direction.yaw == 90:
-    return block.PISTON.FACING_WEST
-  elif turtle.direction.yaw == 180:
-    return block.PISTON.FACING_NORTH
-  else:
-    return block.PISTON.FACING_EAST
+  if turtle.direction.pitch <= 0:
+    facing = facing_from_yaw
+  if turtle.direction.pitch <= -45:
+    facing = block.PISTON.FACING_UP
+  if turtle.direction.pitch <= -135:
+    facing = _opposite_facing(facing_from_yaw)
+
+  if turtle.direction.pitch > 0:
+    facing = facing_from_yaw
+  if turtle.direction.pitch >= 45:
+    facing = block.PISTON.FACING_DOWN
+  if turtle.direction.pitch >= 135:
+    facing = _opposite_facing(facing_from_yaw)
+
+  return facing
 
 def _draw_thing(position, *args):
   if isinstance(args[0], block_definition.BlockDefinition):

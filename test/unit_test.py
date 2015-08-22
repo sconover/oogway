@@ -106,9 +106,9 @@ class TestUnit(unittest.TestCase):
     forward()
 
     self.assertEqual({
-      (1,1,6):"gold_block",
-      (1,1,7):"gold_block",
-      (1,1,8):("piston", {"facing":"south"})
+      (1,1,6): "gold_block",
+      (1,1,7): "gold_block",
+      (1,1,8): ("piston", {"facing":"south"})
     }, self.game.tiles)
 
   def test_pen_down_pen_up(self):
@@ -123,13 +123,13 @@ class TestUnit(unittest.TestCase):
     forward()
 
     self.assertEqual({
-      (1,1,6):"gold_block",
-      (1,1,7):"gold_block",
-      (1,1,8):"air",
-      (1,1,9):"air",
-      (1,1,10):"gold_block",
-      (1,1,11):"gold_block",
-      (1,1,12):("piston", {"facing":"south"})
+      (1,1,6):  "gold_block",
+      (1,1,7):  "gold_block",
+      (1,1,8):  "air",
+      (1,1,9):  "air",
+      (1,1,10): "gold_block",
+      (1,1,11): "gold_block",
+      (1,1,12): ("piston", {"facing":"south"})
     }, self.game.tiles)
 
   def test_show_that_pen_up_is_currently_destructive(self):
@@ -143,10 +143,10 @@ class TestUnit(unittest.TestCase):
     forward()
 
     self.assertEqual({
-      (1,1,6):"air",
-      (1,1,7):("piston", {"facing":"south"}), # the second turtle, overwriting the first path
-      (1,1,8):"gold_block",
-      (1,1,9):("piston", {"facing":"south"}) # the original turtle
+      (1,1,6): "air",
+      (1,1,7): ("piston", {"facing":"south"}), # the second turtle, overwriting the first path
+      (1,1,8): "gold_block",
+      (1,1,9): ("piston", {"facing":"south"}) # the original turtle
     }, self.game.tiles)
 
 if __name__ == '__main__':

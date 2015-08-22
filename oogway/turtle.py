@@ -1,15 +1,15 @@
-from mcgamedata import block, block_definition
+from mcgamedata import block, block_definition, living_definition
 from collections import namedtuple
 from time import sleep
 from sphere_math import calculate_point_on_sphere
 from orientation import Position, Direction
 
 class TurtleSession():
-  def __init__(self, position, direction):
+  def __init__(self, position, direction, default_trail):
     self.position = position
     self.direction = direction
     self.delay = 0.1
-    self.trail = [block.GOLD_BLOCK]
+    self.trail = default_trail
 
 class Minecraft():
   def __init__(self):
@@ -65,7 +65,7 @@ def init(mcpi_minecraft_connect_function, player=None):
 def chat(message):
   minecraft.chat(message)
 
-def begin(start_distance_from_player=5):
+def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK]):
   pos = minecraft.get_player_tile_pos()
   rotation_degrees = minecraft.get_player_rotation_degrees()
 
@@ -90,7 +90,7 @@ def begin(start_distance_from_player=5):
   start_x = pos.x + position_diff.x
   start_y = pos.y + position_diff.y
   start_z = pos.z + position_diff.z
-  minecraft.turtle_session = TurtleSession(Position(start_x, start_y, start_z), Direction(yaw, 0, 0))
+  minecraft.turtle_session = TurtleSession(Position(start_x, start_y, start_z), Direction(yaw, 0, 0), default_trail)
   _draw_turtle()
 
 def _draw_turtle():
@@ -111,14 +111,14 @@ def _turtle_facing():
     return block.PISTON.FACING_EAST
 
 def _draw_thing(position, *args):
-  if type(args[0]) == block_definition.BlockDefintion:
+  if isinstance(args[0], block_definition.BlockDefinition):
     minecraft.set_block(
       position.x, position.y, position.z,
       *args)
-  elif type(args[0]) == living_definition.LivingDefintion:
-    raise "can't handle living yet"
+  elif isinstance(args[0], living_definition.LivingDefinition):
+    raise Exception("can't handle living yet")
   else:
-    raise "don't know what to do with " + str(args)
+    raise Exception("don't know what to do with " + str(args))
 
 def _move(x,y,z):
   turtle = minecraft.turtle_session

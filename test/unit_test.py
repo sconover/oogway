@@ -37,7 +37,10 @@ class FakeMcpi():
     self.tiles = {}
 
   def setBlockV2(self, x, y, z, block_type_name, **property_to_value):
-    self.tiles[(x,y,z)] = (block_type_name, property_to_value)
+    if property_to_value == {}:
+      self.tiles[(x,y,z)] = block_type_name
+    else:
+      self.tiles[(x,y,z)] = (block_type_name, property_to_value)
 
   def postToChat(self, message):
     self.chat_log.append(message)
@@ -48,7 +51,7 @@ class FakeMcpi():
 
 class TestUnit(unittest.TestCase):
   def setUp(self):
-    game = FakeMcpi(FakeMcpiPlayer(90, Vector(1,1,1)))
+    game = FakeMcpi(FakeMcpiPlayer(3, Vector(1,1,1)))
 
     def connect():
       return game
@@ -66,26 +69,36 @@ class TestUnit(unittest.TestCase):
   def test_begin_the_begin(self):
     self.game.player.tile_pos = Vector(1,1,1)
     self.game.player.rotation = 2
-    begin(5)
+    begin(start_distance_from_player=5)
     self.assertEqual({(1,1,6):("piston", {"facing":"south"})}, self.game.tiles)
 
     self.game.reset()
     self.game.player.tile_pos = Vector(1,1,1)
     self.game.player.rotation = 92
-    begin(5)
+    begin(start_distance_from_player=5)
     self.assertEqual({(-4,1,1):("piston", {"facing":"west"})}, self.game.tiles)
 
     self.game.reset()
     self.game.player.tile_pos = Vector(1,1,1)
     self.game.player.rotation = 182
-    begin(5)
+    begin(start_distance_from_player=5)
     self.assertEqual({(0,1,-4):("piston", {"facing":"north"})}, self.game.tiles)
 
     self.game.reset()
     self.game.player.tile_pos = Vector(1,1,1)
     self.game.player.rotation = 272
-    begin(5)
+    begin(start_distance_from_player=5)
     self.assertEqual({(6,1,0):("piston", {"facing":"east"})}, self.game.tiles)
+
+  def test_forward(self):
+    begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK])
+    forward()
+    forward()
+    self.assertEqual({
+      (1,1,6):"gold_block",
+      (1,1,7):"gold_block",
+      (1,1,8):("piston", {"facing":"south"})
+    }, self.game.tiles)
 
 if __name__ == '__main__':
     unittest.main()

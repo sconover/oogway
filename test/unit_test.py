@@ -111,6 +111,16 @@ class TestUnit(unittest.TestCase):
       (1,1,8): ("piston", {"facing":"south"})
     }, self.game.tiles)
 
+  def test_delay(self):
+    self.begin_for_testing()
+    delay(1)
+    forward()
+    forward()
+    delay(2)
+    forward()
+
+    self.assertEqual([1,1,2], self.slept)
+
   def test_pen_down_pen_up(self):
     self.begin_for_testing()
     forward()

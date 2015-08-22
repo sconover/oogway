@@ -121,7 +121,7 @@ class TestUnit(unittest.TestCase):
 
     self.assertEqual([1,1,2], self.slept)
 
-  def test_right(self):
+  def test_right_90(self):
     self.begin_for_testing()
     forward()
     right(90)
@@ -140,6 +140,49 @@ class TestUnit(unittest.TestCase):
       (0,1,7): "gold_block",
       (-1,1,7): ("piston", {"facing":"west"})
     }, self.game.tiles)
+
+  def test_left_90(self):
+    self.begin_for_testing()
+    forward()
+    left(90)
+
+    self.assertEqual({
+      (1,1,6): "gold_block",
+      (1,1,7): ("piston", {"facing":"east"})
+    }, self.game.tiles)
+
+    forward()
+    forward()
+
+    self.assertEqual({
+      (1,1,6): "gold_block",
+      (1,1,7): "gold_block",
+      (2,1,7): "gold_block",
+      (3,1,7): ("piston", {"facing":"east"})
+    }, self.game.tiles)
+
+  def test_up_90(self):
+    self.begin_for_testing()
+    forward()
+    up(90)
+
+    self.assertEqual({
+      (1,1,6): "gold_block",
+      (1,1,7): ("piston", {"facing":"up"})
+    }, self.game.tiles)
+
+    forward()
+    forward()
+
+    self.assertEqual({
+      (1,1,6): "gold_block",
+      (1,1,7): "gold_block",
+      (1,2,7): "gold_block",
+      (1,3,7): ("piston", {"facing":"up"})
+    }, self.game.tiles)
+
+# todo...math bug - maybe it's pitch=270??
+
 
   def test_pen_down_pen_up(self):
     self.begin_for_testing()

@@ -104,8 +104,18 @@ def _draw_turtle():
     turtle.position.x, turtle.position.y, turtle.position.z,
     block.PISTON, _turtle_facing())
 
+# TODO: this needs to take into account yaw/pitch not on right angles
 def _turtle_facing():
   turtle = minecraft.turtle_session
+
+  # see https://bukkit.org/threads/tutorial-how-to-calculate-vectors.138849/
+  # for notes on minecraft quirks
+
+  if turtle.direction.pitch == 270:
+    return block.PISTON.FACING_UP
+  elif turtle.direction.pitch == 90:
+    return block.PISTON.FACING_DOWN
+
   if turtle.direction.yaw == 0:
     return block.PISTON.FACING_SOUTH
   elif turtle.direction.yaw == 90:

@@ -111,7 +111,7 @@ def _turtle_facing():
   # see https://bukkit.org/threads/tutorial-how-to-calculate-vectors.138849/
   # for notes on minecraft quirks
 
-  if turtle.direction.pitch == 270:
+  if turtle.direction.pitch == -90:
     return block.PISTON.FACING_UP
   elif turtle.direction.pitch == 90:
     return block.PISTON.FACING_DOWN
@@ -217,9 +217,9 @@ def up(degrees):
   turtle = minecraft.turtle_session
 
   turtle.direction.pitch -= degrees
-  if turtle.direction.pitch >= 360:
+  if turtle.direction.pitch >= 180:
       turtle.direction.pitch = turtle.direction.pitch - 360
-  elif turtle.direction.pitch < 0:
+  elif turtle.direction.pitch < -180:
       turtle.direction.pitch = turtle.direction.pitch + 360
   _draw_turtle()
 

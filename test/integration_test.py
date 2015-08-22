@@ -68,18 +68,6 @@ class TestIntegration(unittest.TestCase):
 
 
 
-    # forward()
-    # forward()
-
-    # up(90)
-    # forward()
-    # forward()
-
-    # right(90) # turtle does not actually turn, keeps going up
-    # forward()
-    # forward()
-
-
     forward()
     forward()
 
@@ -87,10 +75,22 @@ class TestIntegration(unittest.TestCase):
     forward()
     forward()
 
-    down(90) # cancels out the up
-    right(90) # turtle turns right
+    right(90) # turtle does not actually turn, keeps going up
     forward()
     forward()
+
+
+    # forward()
+    # forward()
+
+    # up(90)
+    # forward()
+    # forward()
+
+    # down(90) # cancels out the up
+    # right(90) # turtle turns right
+    # forward()
+    # forward()
 
 
     # start_task(living.OCELOT.SIT)

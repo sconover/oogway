@@ -121,6 +121,26 @@ class TestUnit(unittest.TestCase):
 
     self.assertEqual([1,1,2], self.slept)
 
+  def test_right(self):
+    self.begin_for_testing()
+    forward()
+    right(90)
+
+    self.assertEqual({
+      (1,1,6): "gold_block",
+      (1,1,7): ("piston", {"facing":"west"})
+    }, self.game.tiles)
+
+    forward()
+    forward()
+
+    self.assertEqual({
+      (1,1,6): "gold_block",
+      (1,1,7): "gold_block",
+      (0,1,7): "gold_block",
+      (-1,1,7): ("piston", {"facing":"west"})
+    }, self.game.tiles)
+
   def test_pen_down_pen_up(self):
     self.begin_for_testing()
     forward()

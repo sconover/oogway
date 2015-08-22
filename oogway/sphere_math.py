@@ -9,13 +9,19 @@ def calculate_point_on_sphere(direction, radius):
     # "The "+ 90" adds 90 degrees to the players pitch/yaw which corrects
     # for the 90 degree rotation Notch added."
 
+    yaw = direction.yaw - 90
+    if yaw < 0:
+        yaw += 360
+
+    pitch = direction.pitch + 90
+    if pitch >= 360:
+        pitch -= 360
+
     # yaw is the angle around the z axis, aka phi
-    yaw_radians = radians(direction.yaw)
+    yaw_radians = radians(yaw)
 
     # pitch is the angle around the y axis, aka theta
-    pitch_radians = radians(direction.pitch)
-
-
+    pitch_radians = radians(pitch)
 
     # print "yaw_radians=" + str(yaw_radians) + " pitch_radians=" + str(pitch_radians)
 
@@ -35,16 +41,16 @@ def calculate_point_on_sphere(direction, radius):
     # print "cos(pitch_radians)=" + str(cos(pitch_radians)) + " cos(yaw_radians)=" + str(cos(yaw_radians))
 
     x = radius * -1 * cos(pitch_radians) * sin(yaw_radians)
-    y = radius * -1 * sin(pitch_radians)
+    y = radius * sin(pitch_radians)
     z = radius * cos(pitch_radians) * cos(yaw_radians)
 
     parts = [
         ["x", x],
         ["y", y],
         ["z", z],
-        ["yaw", direction.yaw],
+        ["yaw", yaw],
         ["yr", yaw_radians],
-        ["pitch", direction.pitch],
+        ["pitch", pitch],
         ["pr", pitch_radians],
         ["cos(pr)", cos(pitch_radians)],
         ["sin(yr)", sin(yaw_radians)],

@@ -69,31 +69,31 @@ def chat(message):
 def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_function=sleep):
   pos = minecraft.get_player_tile_pos()
   rotation_degrees = minecraft.get_player_rotation_degrees()
+  if rotation_degrees < 0:
+    rotation_degrees = 360 + rotation_degrees
 
-  facing = None
-  yaw = None
-  if rotation_degrees >= 315 and rotation_degrees < 360 or \
-     rotation_degrees >= 0 and rotation_degrees < 45:
-    facing = block.PISTON.FACING_SOUTH
-    yaw = 0
-  elif rotation_degrees >= 45 and rotation_degrees < 135:
-    facing = block.PISTON.FACING_WEST
-    yaw = 90
-  elif rotation_degrees >= 135 and rotation_degrees < 225:
-    facing = block.PISTON.FACING_NORTH
+
+  print rotation_degrees
+  horizon_pitch = 90
+
+  facing = _facing_based_on_yaw(rotation_degrees)
+  yaw = 0
+  if facing == block.PISTON.FACING_SOUTH:
     yaw = 180
-  else:
-    facing = block.PISTON.FACING_EAST
+  if facing == block.PISTON.FACING_WEST:
     yaw = 270
-
-  position_diff = calculate_point_on_sphere(direction=Direction(yaw, 0, 0), radius=start_distance_from_player)
+  elif facing == block.PISTON.FACING_NORTH:
+    yaw = 0
+  elif facing == block.PISTON.FACING_EAST:
+    yaw = 90
+  position_diff = calculate_point_on_sphere(direction=Direction(yaw, horizon_pitch, 0), radius=start_distance_from_player)
 
   start_x = pos.x + position_diff.x
   start_y = pos.y + position_diff.y
   start_z = pos.z + position_diff.z
   minecraft.turtle_session = TurtleSession(
     Position(start_x, start_y, start_z),
-    Direction(yaw, 0, 0),
+    Direction(yaw, horizon_pitch, 0),
     default_trail,
     sleep_function)
   _draw_turtle()
@@ -104,19 +104,20 @@ def _draw_turtle():
     turtle.position.x, turtle.position.y, turtle.position.z,
     block.PISTON, _turtle_facing())
 
-# TODO: this needs to take into account yaw/pitch not on right angles
-def _facing_based_on_yaw():
+def _facing_based_on_yaw(yaw):
   turtle = minecraft.turtle_session
 
-  facing = block.PISTON.FACING_SOUTH
-  if turtle.direction.yaw >= 45:
+  facing = None
+  if yaw >= 0:
     facing = block.PISTON.FACING_WEST
-  if turtle.direction.yaw >= 135:
+  if yaw >= 45:
     facing = block.PISTON.FACING_NORTH
-  if turtle.direction.yaw >= 225:
+  if yaw >= 135:
     facing = block.PISTON.FACING_EAST
-  if turtle.direction.yaw >= 315:
+  if yaw >= 225:
     facing = block.PISTON.FACING_SOUTH
+  if yaw >= 315:
+    facing = block.PISTON.FACING_WEST
 
   return facing
 
@@ -139,25 +140,19 @@ def _opposite_facing(facing):
 def _turtle_facing():
   turtle = minecraft.turtle_session
 
-  # see https://bukkit.org/threads/tutorial-how-to-calculate-vectors.138849/
-  # for notes on minecraft quirks
-
-  facing_from_yaw = _facing_based_on_yaw()
+  facing_from_yaw = _facing_based_on_yaw(turtle.direction.yaw)
   facing = facing_from_yaw
 
-  if turtle.direction.pitch <= 0:
+  if turtle.direction.pitch >= 0:
+    facing = facing = block.PISTON.FACING_UP
+  if turtle.direction.pitch >= 90:
     facing = facing_from_yaw
-  if turtle.direction.pitch <= -45:
-    facing = block.PISTON.FACING_UP
-  if turtle.direction.pitch <= -135:
-    facing = _opposite_facing(facing_from_yaw)
-
-  if turtle.direction.pitch > 0:
-    facing = facing_from_yaw
-  if turtle.direction.pitch >= 45:
-    facing = block.PISTON.FACING_DOWN
   if turtle.direction.pitch >= 135:
+    facing = block.PISTON.FACING_DOWN
+  if turtle.direction.pitch >= 225:
     facing = _opposite_facing(facing_from_yaw)
+  if turtle.direction.pitch >= 315:
+    facing = block.PISTON.FACING_UP
 
   return facing
 
@@ -253,10 +248,10 @@ def up(degrees):
   turtle = minecraft.turtle_session
 
   turtle.direction.pitch -= degrees
-  if turtle.direction.pitch >= 180:
-      turtle.direction.pitch = turtle.direction.pitch - 360
-  elif turtle.direction.pitch < -180:
-      turtle.direction.pitch = turtle.direction.pitch + 360
+  if turtle.direction.pitch >= 360:
+      turtle.direction.pitch -= 360
+  elif turtle.direction.pitch < 0:
+      turtle.direction.pitch += 360
   _draw_turtle()
 
 def down(degrees):

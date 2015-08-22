@@ -297,6 +297,9 @@ class TestUnit(unittest.TestCase):
     }, self.game.tiles)
 
   def test_show_that_pen_up_is_currently_destructive(self):
+
+    # future: enhance the library so that this isn't destructive
+
     self.begin_for_testing()
     forward()
     forward()

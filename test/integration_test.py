@@ -71,13 +71,34 @@ class TestIntegration(unittest.TestCase):
     forward()
     forward()
 
-    up(90)
+    right(90)
+
     forward()
     forward()
 
-    right(90) # turtle does not actually turn, keeps going up
+    left(90)
+
     forward()
     forward()
+
+    left(90)
+
+    forward()
+    forward()
+
+    right(90)
+
+    forward()
+    forward()
+
+    # down(90)
+    # forward()
+    # forward()
+
+    # # up(90)
+    # right(90) # turtle does not actually turn, keeps going up
+    # forward()
+    # forward()
 
 
     # forward()

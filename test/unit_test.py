@@ -256,6 +256,20 @@ class TestUnit(unittest.TestCase):
     up(30) # pitch 90
     self.assertEqual({(100,200,300): ("piston", {"facing":"south"})}, self.game.tiles)
 
+  def test_turn_45_degrees(self):
+    self.begin_for_testing()
+    left(45)
+    forward()
+    forward()
+    forward()
+    forward()
+
+    self.assertEqual({
+      (100,200,300): "gold_block",
+      (101,200,301): "gold_block",
+      (102,200,302): ("piston", {"facing":"south"})
+    }, self.game.tiles)
+
   def test_turn_22_degrees(self):
     self.begin_for_testing()
     left(22)

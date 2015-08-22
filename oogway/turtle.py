@@ -5,11 +5,12 @@ from sphere_math import calculate_point_on_sphere
 from orientation import Position, Direction
 
 class TurtleSession():
-  def __init__(self, position, direction, default_trail):
+  def __init__(self, position, direction, default_trail, sleep_function):
     self.position = position
     self.direction = direction
     self.delay = 0.1
     self.trail = default_trail
+    self.sleep = sleep_function
 
 class Minecraft():
   def __init__(self):
@@ -65,7 +66,7 @@ def init(mcpi_minecraft_connect_function, player=None):
 def chat(message):
   minecraft.chat(message)
 
-def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK]):
+def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_function=sleep):
   pos = minecraft.get_player_tile_pos()
   rotation_degrees = minecraft.get_player_rotation_degrees()
 
@@ -90,7 +91,11 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK]):
   start_x = pos.x + position_diff.x
   start_y = pos.y + position_diff.y
   start_z = pos.z + position_diff.z
-  minecraft.turtle_session = TurtleSession(Position(start_x, start_y, start_z), Direction(yaw, 0, 0), default_trail)
+  minecraft.turtle_session = TurtleSession(
+    Position(start_x, start_y, start_z),
+    Direction(yaw, 0, 0),
+    default_trail,
+    sleep_function)
   _draw_turtle()
 
 def _draw_turtle():
@@ -122,7 +127,7 @@ def _draw_thing(position, *args):
 
 def _move(x,y,z):
   turtle = minecraft.turtle_session
-  sleep(turtle.delay)
+  turtle.sleep(turtle.delay)
   a = turtle.position
   b = Position(x,y,z)
 
@@ -151,6 +156,22 @@ def forward():
 def pen_down(*args):
   turtle = minecraft.turtle_session
   turtle.trail = args
+
+# TODO: we really need to replace the turtle with the block that was there (exactly as it was)
+# this is an invitation to create a remote call that sends down all of the block info at the
+# given position, such that we can remember it.
+#
+# ...also leads into creating a "test" method - to test the block just in front of us
+#
+# for network efficiency, perhaps the remote calls should return detail for all blocks adjacent to
+# the current block? (though, that could be a lot of data)...
+#
+# ...or make "return the block in x direction" or "at x coords" an optional param...
+#
+# *** ...or just make a batch endpoint ***
+def pen_up(*args):
+  turtle = minecraft.turtle_session
+  turtle.trail = [block.AIR] # this is destructive.
 
 
 # pen_down(living.OCELOT)

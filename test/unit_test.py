@@ -7,7 +7,7 @@ turtle_path = os.path.join(this_dir, "../")
 sys.path.append(mcgamedata_relative_path)
 sys.path.append(turtle_path)
 
-from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down, delay, down
+from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down, pen_up, delay, down
 from mcgamedata import block
 
 class Vector():
@@ -56,10 +56,20 @@ class TestUnit(unittest.TestCase):
     def connect():
       return game
 
+    slept = []
+    def fake_sleep(interval):
+      slept.append(interval)
+
     self.game = game
     self.connect = connect
+    self.slept = slept
 
     init(self.connect, "papadapadapa")
+
+    def begin_for_testing():
+      begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_function=fake_sleep)
+
+    self.begin_for_testing = begin_for_testing
 
   def test_chat(self):
     chat("hi")
@@ -69,35 +79,74 @@ class TestUnit(unittest.TestCase):
   def test_begin_the_begin(self):
     self.game.player.tile_pos = Vector(1,1,1)
     self.game.player.rotation = 2
-    begin(start_distance_from_player=5)
+    self.begin_for_testing()
     self.assertEqual({(1,1,6):("piston", {"facing":"south"})}, self.game.tiles)
 
     self.game.reset()
     self.game.player.tile_pos = Vector(1,1,1)
     self.game.player.rotation = 92
-    begin(start_distance_from_player=5)
+    self.begin_for_testing()
     self.assertEqual({(-4,1,1):("piston", {"facing":"west"})}, self.game.tiles)
 
     self.game.reset()
     self.game.player.tile_pos = Vector(1,1,1)
     self.game.player.rotation = 182
-    begin(start_distance_from_player=5)
+    self.begin_for_testing()
     self.assertEqual({(0,1,-4):("piston", {"facing":"north"})}, self.game.tiles)
 
     self.game.reset()
     self.game.player.tile_pos = Vector(1,1,1)
     self.game.player.rotation = 272
-    begin(start_distance_from_player=5)
+    self.begin_for_testing()
     self.assertEqual({(6,1,0):("piston", {"facing":"east"})}, self.game.tiles)
 
   def test_forward(self):
-    begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK])
+    self.begin_for_testing()
     forward()
     forward()
+
     self.assertEqual({
       (1,1,6):"gold_block",
       (1,1,7):"gold_block",
       (1,1,8):("piston", {"facing":"south"})
+    }, self.game.tiles)
+
+  def test_pen_down_pen_up(self):
+    self.begin_for_testing()
+    forward()
+    forward()
+    pen_up()
+    forward()
+    forward()
+    pen_down(block.GOLD_BLOCK)
+    forward()
+    forward()
+
+    self.assertEqual({
+      (1,1,6):"gold_block",
+      (1,1,7):"gold_block",
+      (1,1,8):"air",
+      (1,1,9):"air",
+      (1,1,10):"gold_block",
+      (1,1,11):"gold_block",
+      (1,1,12):("piston", {"facing":"south"})
+    }, self.game.tiles)
+
+  def test_show_that_pen_up_is_currently_destructive(self):
+    self.begin_for_testing()
+    forward()
+    forward()
+    forward()
+
+    self.begin_for_testing()
+    pen_up()
+    forward()
+
+    self.assertEqual({
+      (1,1,6):"air",
+      (1,1,7):("piston", {"facing":"south"}), # the second turtle, overwriting the first path
+      (1,1,8):"gold_block",
+      (1,1,9):("piston", {"facing":"south"}) # the original turtle
     }, self.game.tiles)
 
 if __name__ == '__main__':

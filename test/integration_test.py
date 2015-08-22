@@ -17,9 +17,10 @@ from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down,
 from mcgamedata import block
 
 
-class TestTurtle(unittest.TestCase):
+class TestIntegration(unittest.TestCase):
   def test_basic(self):
     def connect():
+        # connect to minecraft server running on localhost, 25565 (default port)
         return mcpi.minecraft.Minecraft.create()
 
     # mcpi_minecraft.setBlockV2(1, 120, 1, block.STONE.name, variant=block.STONE.VARIANT_ANDESITE.value)

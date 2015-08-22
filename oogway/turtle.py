@@ -1,4 +1,4 @@
-from mcgamedata import block
+from mcgamedata import block, block_definition
 from collections import namedtuple
 from time import sleep
 from sphere_math import calculate_point_on_sphere
@@ -9,7 +9,7 @@ class TurtleSession():
     self.position = position
     self.direction = direction
     self.delay = 0.1
-    self.trail = [block.OBSIDIAN]
+    self.trail = [block.GOLD_BLOCK]
 
 class Minecraft():
   def __init__(self):
@@ -110,10 +110,15 @@ def _turtle_facing():
   else:
     return block.PISTON.FACING_EAST
 
-def _draw_block(position, *block_args):
-  minecraft.set_block(
-    position.x, position.y, position.z,
-    *block_args)
+def _draw_thing(position, *args):
+  if type(args[0]) == block_definition.BlockDefintion:
+    minecraft.set_block(
+      position.x, position.y, position.z,
+      *args)
+  elif type(args[0]) == living_definition.LivingDefintion:
+    raise "can't handle living yet"
+  else:
+    raise "don't know what to do with " + str(args)
 
 def _move(x,y,z):
   turtle = minecraft.turtle_session
@@ -122,7 +127,7 @@ def _move(x,y,z):
   b = Position(x,y,z)
 
   turtle.position = b
-  _draw_block(a, *turtle.trail)
+  _draw_thing(a, *turtle.trail)
   _draw_turtle()
 
 
@@ -143,9 +148,20 @@ def forward():
   # print position_diff
   _move_relative(position_diff.x, position_diff.y, position_diff.z)
 
-def pen_down(*block_args):
+def pen_down(*args):
   turtle = minecraft.turtle_session
-  turtle.trail = block_args
+  turtle.trail = args
+
+
+# pen_down(living.OCELOT)
+# start_task(living.ANY.FOLLOW_OWNER) # implicit select of things that have this task
+# start_task(living.OCELOT.FOLLOW_OWNER) # implicit select of ocelots
+# start_task(living.OCELOT.FOLLOW_OWNER, select=recent(living.OCELOT))
+# start_task(living.OCELOT.FOLLOW_OWNER, select=recent(living.OCELOT, offset))
+# start_task(living.OCELOT.FOLLOW_OWNER, select=recent(living.OCELOT, range))
+# start_task(living.OCELOT.FOLLOW_OWNER, select=beginning(living.OCELOT, offset))
+# start_task(living.OCELOT.FOLLOW_OWNER, select=beginning(living.OCELOT, range))
+
 
 # check(is(block.AIR))
 # check(is_not(block.AIR))

@@ -51,7 +51,7 @@ class FakeMcpi():
 
 class TestUnit(unittest.TestCase):
   def setUp(self):
-    game = FakeMcpi(FakeMcpiPlayer(3, Vector(1,1,1)))
+    game = FakeMcpi(FakeMcpiPlayer(3, Vector(100,200,300)))
 
     def connect():
       return game
@@ -66,8 +66,10 @@ class TestUnit(unittest.TestCase):
 
     init(self.connect, "papadapadapa")
 
-    def begin_for_testing():
-      begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_function=fake_sleep)
+    def begin_for_testing(start_distance_from_player=0):
+      begin(start_distance_from_player=start_distance_from_player,
+        default_trail=[block.GOLD_BLOCK],
+        sleep_function=fake_sleep)
 
     self.begin_for_testing = begin_for_testing
 
@@ -77,28 +79,28 @@ class TestUnit(unittest.TestCase):
     self.assertEqual(["hi", "there"], self.game.chat_log)
 
   def test_begin_the_begin(self):
-    self.game.player.tile_pos = Vector(1,1,1)
+    self.game.player.tile_pos = Vector(100,200,300)
     self.game.player.rotation = 2
-    self.begin_for_testing()
-    self.assertEqual({(1,1,6):("piston", {"facing":"south"})}, self.game.tiles)
+    self.begin_for_testing(start_distance_from_player=5)
+    self.assertEqual({(100,200,305):("piston", {"facing":"south"})}, self.game.tiles)
 
     self.game.reset()
-    self.game.player.tile_pos = Vector(1,1,1)
+    self.game.player.tile_pos = Vector(100,200,300)
     self.game.player.rotation = 92
-    self.begin_for_testing()
-    self.assertEqual({(-4,1,1):("piston", {"facing":"west"})}, self.game.tiles)
+    self.begin_for_testing(start_distance_from_player=5)
+    self.assertEqual({(95,200,300):("piston", {"facing":"west"})}, self.game.tiles)
 
     self.game.reset()
-    self.game.player.tile_pos = Vector(1,1,1)
+    self.game.player.tile_pos = Vector(100,200,300)
     self.game.player.rotation = 182
-    self.begin_for_testing()
-    self.assertEqual({(0,1,-4):("piston", {"facing":"north"})}, self.game.tiles)
+    self.begin_for_testing(start_distance_from_player=5)
+    self.assertEqual({(100,200,295):("piston", {"facing":"north"})}, self.game.tiles)
 
     self.game.reset()
-    self.game.player.tile_pos = Vector(1,1,1)
+    self.game.player.tile_pos = Vector(100,200,300)
     self.game.player.rotation = 272
-    self.begin_for_testing()
-    self.assertEqual({(6,1,0):("piston", {"facing":"east"})}, self.game.tiles)
+    self.begin_for_testing(start_distance_from_player=5)
+    self.assertEqual({(105,200,300):("piston", {"facing":"east"})}, self.game.tiles)
 
   def test_forward(self):
     self.begin_for_testing()
@@ -106,9 +108,9 @@ class TestUnit(unittest.TestCase):
     forward()
 
     self.assertEqual({
-      (1,1,6): "gold_block",
-      (1,1,7): "gold_block",
-      (1,1,8): ("piston", {"facing":"south"})
+      (100,200,300): "gold_block",
+      (100,200,301): "gold_block",
+      (100,200,302): ("piston", {"facing":"south"})
     }, self.game.tiles)
 
   def test_delay(self):
@@ -127,18 +129,18 @@ class TestUnit(unittest.TestCase):
     right(90)
 
     self.assertEqual({
-      (1,1,6): "gold_block",
-      (1,1,7): ("piston", {"facing":"west"})
+      (100,200,300): "gold_block",
+      (100,200,301): ("piston", {"facing":"west"})
     }, self.game.tiles)
 
     forward()
     forward()
 
     self.assertEqual({
-      (1,1,6): "gold_block",
-      (1,1,7): "gold_block",
-      (0,1,7): "gold_block",
-      (-1,1,7): ("piston", {"facing":"west"})
+      (100,200,300): "gold_block",
+      (100,200,301): "gold_block",
+      ( 99,200,301): "gold_block",
+      ( 98,200,301): ("piston", {"facing":"west"})
     }, self.game.tiles)
 
   def test_left_90(self):
@@ -147,18 +149,18 @@ class TestUnit(unittest.TestCase):
     left(90)
 
     self.assertEqual({
-      (1,1,6): "gold_block",
-      (1,1,7): ("piston", {"facing":"east"})
+      (100,200,300): "gold_block",
+      (100,200,301): ("piston", {"facing":"east"})
     }, self.game.tiles)
 
     forward()
     forward()
 
     self.assertEqual({
-      (1,1,6): "gold_block",
-      (1,1,7): "gold_block",
-      (2,1,7): "gold_block",
-      (3,1,7): ("piston", {"facing":"east"})
+      (100,200,300): "gold_block",
+      (100,200,301): "gold_block",
+      (101,200,301): "gold_block",
+      (102,200,301): ("piston", {"facing":"east"})
     }, self.game.tiles)
 
   def test_up_90(self):
@@ -167,18 +169,18 @@ class TestUnit(unittest.TestCase):
     up(90)
 
     self.assertEqual({
-      (1,1,6): "gold_block",
-      (1,1,7): ("piston", {"facing":"up"})
+      (100,200,300): "gold_block",
+      (100,200,301): ("piston", {"facing":"up"})
     }, self.game.tiles)
 
     forward()
     forward()
 
     self.assertEqual({
-      (1,1,6): "gold_block",
-      (1,1,7): "gold_block",
-      (1,2,7): "gold_block",
-      (1,3,7): ("piston", {"facing":"up"})
+      (100,200,300): "gold_block",
+      (100,200,301): "gold_block",
+      (100,201,301): "gold_block",
+      (100,202,301): ("piston", {"facing":"up"})
     }, self.game.tiles)
 
   def test_down_90(self):
@@ -187,74 +189,72 @@ class TestUnit(unittest.TestCase):
     down(90)
 
     self.assertEqual({
-      (1,1,6): "gold_block",
-      (1,1,7): ("piston", {"facing":"down"})
+      (100,200,300): "gold_block",
+      (100,200,301): ("piston", {"facing":"down"})
     }, self.game.tiles)
 
     forward()
     forward()
 
     self.assertEqual({
-      (1,1,6): "gold_block",
-      (1,1,7): "gold_block",
-      (1,0,7): "gold_block",
-      (1,-1,7): ("piston", {"facing":"down"})
+      (100,200,300): "gold_block",
+      (100,200,301): "gold_block",
+      (100,199,301): "gold_block",
+      (100,198,301): ("piston", {"facing":"down"})
     }, self.game.tiles)
 
   def test_turns_and_piston_facing(self):
     self.begin_for_testing()
-    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"south"})}, self.game.tiles)
     right(30)
-    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"south"})}, self.game.tiles)
     right(30) # yaw 60
-    self.assertEqual({(1,1,6): ("piston", {"facing":"west"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"west"})}, self.game.tiles)
     right(30) # yaw 90 - due west
-    self.assertEqual({(1,1,6): ("piston", {"facing":"west"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"west"})}, self.game.tiles)
     right(30) # yaw 120
-    self.assertEqual({(1,1,6): ("piston", {"facing":"west"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"west"})}, self.game.tiles)
     right(30) # yaw 150
-    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"north"})}, self.game.tiles)
     right(30) # yaw 180 - due north
-    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"north"})}, self.game.tiles)
     right(30) # yaw 210
-    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"north"})}, self.game.tiles)
     right(30) # yaw 240
-    self.assertEqual({(1,1,6): ("piston", {"facing":"east"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"east"})}, self.game.tiles)
     right(30) # yaw 270 - due east
-    self.assertEqual({(1,1,6): ("piston", {"facing":"east"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"east"})}, self.game.tiles)
     right(30) # yaw 300
-    self.assertEqual({(1,1,6): ("piston", {"facing":"east"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"east"})}, self.game.tiles)
     right(30) # yaw 330
-    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"south"})}, self.game.tiles)
     right(30) # yaw 360
-    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"south"})}, self.game.tiles)
 
-    # pitch in minecraft is weird. 0 is the horizon, -90 is straight up, 90 is straight down
-    # see https://bukkit.org/threads/tutorial-how-to-calculate-vectors.138849/
-    up(30) # pitch -30
-    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
-    up(30) # pitch -60
-    self.assertEqual({(1,1,6): ("piston", {"facing":"up"})}, self.game.tiles)
-    up(30) # pitch -90 - straight up
-    self.assertEqual({(1,1,6): ("piston", {"facing":"up"})}, self.game.tiles)
-    up(30) # pitch -120
-    self.assertEqual({(1,1,6): ("piston", {"facing":"up"})}, self.game.tiles)
-    up(30) # pitch -150
-    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
-    up(30) # pitch -180
-    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
-    up(30) # pitch 150
-    self.assertEqual({(1,1,6): ("piston", {"facing":"north"})}, self.game.tiles)
-    up(30) # pitch 120
-    self.assertEqual({(1,1,6): ("piston", {"facing":"down"})}, self.game.tiles)
-    up(30) # pitch 90 - straight down
-    self.assertEqual({(1,1,6): ("piston", {"facing":"down"})}, self.game.tiles)
     up(30) # pitch 60
-    self.assertEqual({(1,1,6): ("piston", {"facing":"down"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"south"})}, self.game.tiles)
     up(30) # pitch 30
-    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
-    up(30) # pitch 0
-    self.assertEqual({(1,1,6): ("piston", {"facing":"south"})}, self.game.tiles)
+    self.assertEqual({(100,200,300): ("piston", {"facing":"up"})}, self.game.tiles)
+    up(30) # pitch 0 - straight up
+    self.assertEqual({(100,200,300): ("piston", {"facing":"up"})}, self.game.tiles)
+    up(30) # pitch 330
+    self.assertEqual({(100,200,300): ("piston", {"facing":"up"})}, self.game.tiles)
+    up(30) # pitch 300
+    self.assertEqual({(100,200,300): ("piston", {"facing":"north"})}, self.game.tiles)
+    up(30) # pitch 270
+    self.assertEqual({(100,200,300): ("piston", {"facing":"north"})}, self.game.tiles)
+    up(30) # pitch 240
+    self.assertEqual({(100,200,300): ("piston", {"facing":"north"})}, self.game.tiles)
+    up(30) # pitch 210
+    self.assertEqual({(100,200,300): ("piston", {"facing":"down"})}, self.game.tiles)
+    up(30) # pitch 180 - straight down
+    self.assertEqual({(100,200,300): ("piston", {"facing":"down"})}, self.game.tiles)
+    up(30) # pitch 150
+    self.assertEqual({(100,200,300): ("piston", {"facing":"down"})}, self.game.tiles)
+    up(30) # pitch 120
+    self.assertEqual({(100,200,300): ("piston", {"facing":"south"})}, self.game.tiles)
+    up(30) # pitch 90
+    self.assertEqual({(100,200,300): ("piston", {"facing":"south"})}, self.game.tiles)
 
   def test_turn_22_degrees(self):
     self.begin_for_testing()
@@ -267,12 +267,12 @@ class TestUnit(unittest.TestCase):
     forward()
 
     self.assertEqual({
-      (1,1,6):  "gold_block",
-      (1,1,7):  "gold_block",
-      (2,1,8):  "gold_block",
-      (2,1,9):  "gold_block",
-      (2,1,10): "gold_block",
-      (3,1,11): ("piston", {"facing":"south"})
+      (100,200,300): "gold_block",
+      (100,200,301): "gold_block",
+      (101,200,302): "gold_block",
+      (101,200,303): "gold_block",
+      (101,200,304): "gold_block",
+      (102,200,305): ("piston", {"facing":"south"})
     }, self.game.tiles)
 
   def test_pen_down_pen_up(self):
@@ -287,13 +287,13 @@ class TestUnit(unittest.TestCase):
     forward()
 
     self.assertEqual({
-      (1,1,6):  "gold_block",
-      (1,1,7):  "gold_block",
-      (1,1,8):  "air",
-      (1,1,9):  "air",
-      (1,1,10): "gold_block",
-      (1,1,11): "gold_block",
-      (1,1,12): ("piston", {"facing":"south"})
+      (100,200,300): "gold_block",
+      (100,200,301): "gold_block",
+      (100,200,302): "air",
+      (100,200,303): "air",
+      (100,200,304): "gold_block",
+      (100,200,305): "gold_block",
+      (100,200,306): ("piston", {"facing":"south"})
     }, self.game.tiles)
 
   def test_show_that_pen_up_is_currently_destructive(self):
@@ -310,10 +310,10 @@ class TestUnit(unittest.TestCase):
     forward()
 
     self.assertEqual({
-      (1,1,6): "air",
-      (1,1,7): ("piston", {"facing":"south"}), # the second turtle, overwriting the first path
-      (1,1,8): "gold_block",
-      (1,1,9): ("piston", {"facing":"south"}) # the original turtle
+      (100,200,300): "air",
+      (100,200,301): ("piston", {"facing":"south"}), # the second turtle, overwriting the first path
+      (100,200,302): "gold_block",
+      (100,200,303): ("piston", {"facing":"south"}) # the original turtle
     }, self.game.tiles)
 
 if __name__ == '__main__':

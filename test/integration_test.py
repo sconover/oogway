@@ -69,27 +69,29 @@ class TestIntegration(unittest.TestCase):
 
 
     forward()
-    forward()
-
-    right(90)
-
+    down(90)
     forward()
     forward()
 
-    left(90)
+    # right(90)
 
-    forward()
-    forward()
+    # forward()
+    # forward()
 
-    left(90)
+    # left(90)
 
-    forward()
-    forward()
+    # forward()
+    # forward()
 
-    right(90)
+    # left(90)
 
-    forward()
-    forward()
+    # forward()
+    # forward()
+
+    # right(90)
+
+    # forward()
+    # forward()
 
     # down(90)
     # forward()

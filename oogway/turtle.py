@@ -72,8 +72,6 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
   if rotation_degrees < 0:
     rotation_degrees = 360 + rotation_degrees
 
-
-  print rotation_degrees
   horizon_pitch = 90
 
   facing = _facing_based_on_yaw(rotation_degrees)
@@ -145,7 +143,7 @@ def _turtle_facing():
 
   if turtle.direction.pitch >= 0:
     facing = facing = block.PISTON.FACING_UP
-  if turtle.direction.pitch >= 90:
+  if turtle.direction.pitch >= 45:
     facing = facing_from_yaw
   if turtle.direction.pitch >= 135:
     facing = block.PISTON.FACING_DOWN

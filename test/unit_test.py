@@ -181,6 +181,26 @@ class TestUnit(unittest.TestCase):
       (1,3,7): ("piston", {"facing":"up"})
     }, self.game.tiles)
 
+  def test_down_90(self):
+    self.begin_for_testing()
+    forward()
+    down(90)
+
+    self.assertEqual({
+      (1,1,6): "gold_block",
+      (1,1,7): ("piston", {"facing":"down"})
+    }, self.game.tiles)
+
+    forward()
+    forward()
+
+    self.assertEqual({
+      (1,1,6): "gold_block",
+      (1,1,7): "gold_block",
+      (1,0,7): "gold_block",
+      (1,-1,7): ("piston", {"facing":"down"})
+    }, self.game.tiles)
+
 # todo...math bug - maybe it's pitch=270??
 
 

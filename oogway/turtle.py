@@ -1,4 +1,4 @@
-from mcgamedata import block, block_definition, living_definition
+from mcgamedata import block, block_definition, living, living_definition
 from collections import namedtuple
 from time import sleep
 from sphere_math import calculate_point_on_sphere
@@ -11,6 +11,7 @@ class TurtleSession():
     self.delay = 0.1
     self.trail = default_trail
     self.sleep = sleep_function
+    self.living_things_spawned = []
 
 class Minecraft():
   def __init__(self):
@@ -34,6 +35,11 @@ class Minecraft():
   # TODO: pass prepared functions to a runner and potentially all calls?
   # e.g. turn on stderr debugging with a simple method call... trace()
 
+  def batch(self, f):
+    self._m().startBatch()
+    f(self)
+    self._m().endBatch() # todo: guard against failed ends from exceptions/errors?
+
   def set_block(self, x, y, z, gamedata_block, *gamedata_properties):
     property_to_value = {}
     for p in gamedata_properties:
@@ -52,6 +58,9 @@ class Minecraft():
 
     return self._m().entity.spawnV2(int(x), int(y), int(z), gamedata_entity.name, **property_to_value)
 
+  def living_entity_start_task(self, entity_uuid, task):
+    self._m().entity.startTaskV2(entity_uuid, task.task_name)
+
   def get_player_rotation_degrees(self):
     return int(self._m().player.getRotation())
 
@@ -63,6 +72,14 @@ class Minecraft():
     self._m().postToChat(message)
 
 minecraft = Minecraft()
+
+name_to_block = {}
+for block_type in block.ALL:
+  name_to_block[block_type.name] = block_type
+
+name_to_living = {}
+for living_type in living.ALL:
+  name_to_living[living_type.name] = living_type
 
 def init(mcpi_minecraft_connect_function, player=None):
   minecraft.mcpi_minecraft_connect_function = mcpi_minecraft_connect_function
@@ -165,14 +182,17 @@ def _turtle_facing():
   return facing
 
 def _draw_thing(position, *args):
+  turtle = minecraft.turtle_session
+
   if isinstance(args[0], block_definition.BlockDefinition):
     minecraft.set_block(
       position.x, position.y, position.z,
       *args)
   elif isinstance(args[0], living_definition.LivingDefinition):
-    minecraft.spawn_entity(
+    entity = minecraft.spawn_entity(
       position.x, position.y, position.z,
       args[0])
+    turtle.living_things_spawned.append((name_to_living[entity.type], entity.uuid))
     _draw_thing(position, block.AIR)
   else:
     raise Exception("don't know what to do with " + str(args))
@@ -186,7 +206,6 @@ def _move(x,y,z):
   turtle.position = b
   _draw_thing(a, *turtle.trail)
   _draw_turtle()
-
 
 def _move_relative(x_diff, y_diff, z_diff):
   turtle = minecraft.turtle_session
@@ -224,6 +243,20 @@ def pen_down(*args):
 def pen_up(*args):
   turtle = minecraft.turtle_session
   turtle.trail = [block.AIR] # this is destructive.
+
+def living_things():
+  turtle = minecraft.turtle_session
+  return turtle.living_things_spawned
+
+def _select_all_living_of_type(task, entities):
+  return filter(lambda e: e[0].name == task.entity_name, entities)
+
+def start_task(task, selector=_select_all_living_of_type):
+  def all_tasks_at_once(mc):
+    for entity in _select_all_living_of_type(task, living_things()):
+      entity_uuid = entity[1]
+      mc.living_entity_start_task(entity_uuid, task)
+  minecraft.batch(all_tasks_at_once)
 
 # path of blocks
 #  what if it's sand and the sand falls?

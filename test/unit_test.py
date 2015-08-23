@@ -7,7 +7,8 @@ turtle_path = os.path.join(this_dir, "../")
 sys.path.append(mcgamedata_relative_path)
 sys.path.append(turtle_path)
 
-from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down, pen_up, delay, down
+from oogway.turtle import init, chat, begin, forward, up, right, left, \
+  pen_down, pen_up, delay, down, living_things, start_task
 from mcgamedata import block, living
 
 class Vector():
@@ -27,15 +28,25 @@ class FakeMcpiPlayer():
   def getTilePos(self):
     return self.tile_pos
 
+class EntitySpawnResult():
+  def __init__(self, entity_type_name, uuid):
+    self.type = entity_type_name
+    self.uuid = uuid
+
 class FakeMcpiEntity():
   def __init__(self):
     self.entities_created = []
+    self.tasks_in_progress = []
 
   def spawnV2(self, x, y, z, entity_type_name, **property_to_value):
     if property_to_value == {}:
       self.entities_created.append((x,y,z,entity_type_name))
     else:
       self.entities_created.append((x,y,z,entity_type_name, property_to_value))
+    return EntitySpawnResult(entity_type_name, "uuid" + str(len(self.entities_created)))
+
+  def startTaskV2(self, entity_uuid, task_name):
+    self.tasks_in_progress.append((entity_uuid, task_name))
 
 class FakeMcpi():
   def __init__(self, player):
@@ -59,6 +70,12 @@ class FakeMcpi():
   def get_tile(self, x, y, z):
     print self.tiles
     return self.tiles[(x,y,z)]
+
+  def startBatch(this):
+    pass
+
+  def endBatch(this):
+    pass
 
 class TestUnit(unittest.TestCase):
   def setUp(self):
@@ -357,6 +374,38 @@ class TestUnit(unittest.TestCase):
       (100, 200, 300, 'ocelot', {'owner': 'papadapadapa'}),
       (100, 200, 301, 'ocelot', {'owner': 'papadapadapa'})
     ], self.game.entity.entities_created)
+
+  def test_track_spawned_entities(self):
+    self.begin_for_testing()
+    pen_down(living.OCELOT)
+    forward()
+    forward()
+
+    self.assertEqual([
+      (living.OCELOT, "uuid1"),
+      (living.OCELOT, "uuid2")
+    ], living_things())
+
+  def test_living_entity_tasks(self):
+    self.begin_for_testing()
+    pen_down(living.OCELOT)
+    forward()
+    forward()
+    pen_down(living.WOLF)
+    forward()
+
+    self.assertEqual([
+      (living.OCELOT, "uuid1"),
+      (living.OCELOT, "uuid2"),
+      (living.WOLF, "uuid3")
+    ], living_things())
+
+    start_task(living.OCELOT.SIT)
+
+    self.assertEqual([
+      ("uuid1", "sit"),
+      ("uuid2", "sit")
+    ], self.game.entity.tasks_in_progress)
 
 if __name__ == '__main__':
     unittest.main()

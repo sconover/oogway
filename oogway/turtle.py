@@ -42,8 +42,15 @@ class Minecraft():
     # on to a grid.
     self._m().setBlockV2(int(x), int(y), int(z), gamedata_block.name, **property_to_value)
 
-  def spawn_entity(self, x, y, z, gamedata_entity):
-    return self._m().entity.spawnV2(int(x), int(y), int(z), gamedata_entity.name)
+  def spawn_entity(self, x, y, z, gamedata_entity, *entity_properties):
+    property_to_value = {}
+    for p in entity_properties:
+      p.add_to_dict(property_to_value)
+
+    if "owner" not in property_to_value and self.player_name != None:
+      property_to_value["owner"] = self.player_name
+
+    return self._m().entity.spawnV2(int(x), int(y), int(z), gamedata_entity.name, **property_to_value)
 
   def get_player_rotation_degrees(self):
     return int(self._m().player.getRotation())

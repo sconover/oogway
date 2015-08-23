@@ -56,7 +56,7 @@ class TestIntegration(unittest.TestCase):
     delay(0.1)
     pen_down(living.OCELOT)
 
-    for i in xrange(10):
+    for i in xrange(50):
         forward()
     # forward()
 

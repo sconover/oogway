@@ -8,7 +8,7 @@ sys.path.append(mcgamedata_relative_path)
 sys.path.append(turtle_path)
 
 from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down, pen_up, delay, down
-from mcgamedata import block
+from mcgamedata import block, living
 
 class Vector():
   def __init__(self, x, y, z):
@@ -27,9 +27,20 @@ class FakeMcpiPlayer():
   def getTilePos(self):
     return self.tile_pos
 
+class FakeMcpiEntity():
+  def __init__(self):
+    self.entities_created = []
+
+  def spawnV2(self, x, y, z, entity_type_name, **property_to_value):
+    if property_to_value == {}:
+      self.entities_created.append((x,y,z,entity_type_name))
+    else:
+      self.entities_created.append((x,y,z,entity_type_name, property_to_value))
+
 class FakeMcpi():
   def __init__(self, player):
     self.player = player
+    self.entity = FakeMcpiEntity()
     self.reset()
 
   def reset(self):
@@ -329,6 +340,23 @@ class TestUnit(unittest.TestCase):
       (100,200,302): "gold_block",
       (100,200,303): ("piston", {"facing":"south"}) # the original turtle
     }, self.game.tiles)
+
+  def test_spawn_entity(self):
+    self.begin_for_testing()
+    pen_down(living.OCELOT)
+    forward()
+    forward()
+
+    self.assertEqual({
+      (100,200,300): "air",
+      (100,200,301): "air",
+      (100,200,302): ("piston", {"facing":"south"})
+    }, self.game.tiles)
+
+    self.assertEqual([
+      (100, 200, 300, 'ocelot', {'owner': 'papadapadapa'}),
+      (100, 200, 301, 'ocelot', {'owner': 'papadapadapa'})
+    ], self.game.entity.entities_created)
 
 if __name__ == '__main__':
     unittest.main()

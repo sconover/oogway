@@ -61,6 +61,9 @@ class Minecraft():
   def living_entity_start_task(self, entity_uuid, task):
     self._m().entity.startTaskV2(entity_uuid, task.task_name)
 
+  def living_entity_reset_task(self, entity_uuid, task):
+    self._m().entity.resetTaskV2(entity_uuid, task.task_name)
+
   def get_player_rotation_degrees(self):
     return int(self._m().player.getRotation())
 
@@ -256,6 +259,13 @@ def start_task(task, selector=_select_all_living_of_type):
     for entity in _select_all_living_of_type(task, living_things()):
       entity_uuid = entity[1]
       mc.living_entity_start_task(entity_uuid, task)
+  minecraft.batch(all_tasks_at_once)
+
+def reset_task(task, selector=_select_all_living_of_type):
+  def all_tasks_at_once(mc):
+    for entity in _select_all_living_of_type(task, living_things()):
+      entity_uuid = entity[1]
+      mc.living_entity_reset_task(entity_uuid, task)
   minecraft.batch(all_tasks_at_once)
 
 # path of blocks

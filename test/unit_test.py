@@ -8,7 +8,7 @@ sys.path.append(mcgamedata_relative_path)
 sys.path.append(turtle_path)
 
 from oogway.turtle import init, chat, begin, forward, up, right, left, \
-  pen_down, pen_up, delay, down, living_things, start_task
+  pen_down, pen_up, delay, down, living_things, start_task, reset_task
 from mcgamedata import block, living
 
 class Vector():
@@ -47,6 +47,12 @@ class FakeMcpiEntity():
 
   def startTaskV2(self, entity_uuid, task_name):
     self.tasks_in_progress.append((entity_uuid, task_name))
+
+  def resetTaskV2(self, entity_uuid, task_name):
+    for entry in self.tasks_in_progress:
+      if entry == (entity_uuid, task_name):
+        self.tasks_in_progress.remove(entry)
+        break
 
 class FakeMcpi():
   def __init__(self, player):
@@ -405,7 +411,11 @@ class TestUnit(unittest.TestCase):
     self.assertEqual([
       ("uuid1", "sit"),
       ("uuid2", "sit")
-    ], self.game.entity.tasks_in_progress)
+    ], self.game.entity.tasks_in_progress) # by default, only ocelots are selected
+
+    reset_task(living.OCELOT.SIT)
+
+    self.assertEqual([], self.game.entity.tasks_in_progress)
 
 if __name__ == '__main__':
     unittest.main()

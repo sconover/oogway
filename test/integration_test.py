@@ -13,8 +13,9 @@ sys.path.append(turtle_path)
 import unittest
 import mcpi.minecraft
 import mcpi
-from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down, delay, down
+from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down, delay, down, start_task, reset_task
 from mcgamedata import block, living
+from time import sleep
 
 
 class TestIntegration(unittest.TestCase):
@@ -53,11 +54,18 @@ class TestIntegration(unittest.TestCase):
     # forward()
 
     begin()
-    delay(0.1)
+    delay(0.01)
     pen_down(living.OCELOT)
 
     for i in xrange(50):
         forward()
+
+    sleep(2)
+    start_task(living.OCELOT.SIT)
+    sleep(5)
+    reset_task(living.OCELOT.SIT)
+
+    # select_living_things_nearby(type=living.ALL, distance=32*16)
     # forward()
 
     # forward()

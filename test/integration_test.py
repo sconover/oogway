@@ -14,7 +14,7 @@ import unittest
 import mcpi.minecraft
 import mcpi
 from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down, delay, down
-from mcgamedata import block
+from mcgamedata import block, living
 
 
 class TestIntegration(unittest.TestCase):
@@ -53,7 +53,12 @@ class TestIntegration(unittest.TestCase):
     # forward()
 
     begin()
-    pen_down(block.GOLD_BLOCK)
+    delay(0.1)
+    pen_down(living.OCELOT)
+
+    for i in xrange(10):
+        forward()
+    # forward()
 
     # forward()
     # forward()
@@ -65,13 +70,6 @@ class TestIntegration(unittest.TestCase):
     # up(90)
     # forward()
     # forward()
-
-
-
-    forward()
-    down(90)
-    forward()
-    forward()
 
     # right(90)
 

@@ -42,6 +42,9 @@ class Minecraft():
     # on to a grid.
     self._m().setBlockV2(int(x), int(y), int(z), gamedata_block.name, **property_to_value)
 
+  def spawn_entity(self, x, y, z, gamedata_entity):
+    return self._m().entity.spawnV2(int(x), int(y), int(z), gamedata_entity.name)
+
   def get_player_rotation_degrees(self):
     return int(self._m().player.getRotation())
 
@@ -160,7 +163,10 @@ def _draw_thing(position, *args):
       position.x, position.y, position.z,
       *args)
   elif isinstance(args[0], living_definition.LivingDefinition):
-    raise Exception("can't handle living yet")
+    minecraft.spawn_entity(
+      position.x, position.y, position.z,
+      args[0])
+    _draw_thing(position, block.AIR)
   else:
     raise Exception("don't know what to do with " + str(args))
 
@@ -212,8 +218,14 @@ def pen_up(*args):
   turtle = minecraft.turtle_session
   turtle.trail = [block.AIR] # this is destructive.
 
+# path of blocks
+#  what if it's sand and the sand falls?
 
 # pen_down(living.OCELOT)
+
+# living_things()
+  # path of uuids...
+
 # start_task(living.ANY.FOLLOW_OWNER) # implicit select of things that have this task
 # start_task(living.OCELOT.FOLLOW_OWNER) # implicit select of ocelots
 # start_task(living.OCELOT.FOLLOW_OWNER, select=recent(living.OCELOT))
@@ -221,6 +233,8 @@ def pen_up(*args):
 # start_task(living.OCELOT.FOLLOW_OWNER, select=recent(living.OCELOT, range))
 # start_task(living.OCELOT.FOLLOW_OWNER, select=beginning(living.OCELOT, offset))
 # start_task(living.OCELOT.FOLLOW_OWNER, select=beginning(living.OCELOT, range))
+
+# what if some no longer exist? best effort?
 
 
 # check(is(block.AIR))

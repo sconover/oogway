@@ -11,7 +11,7 @@ class TurtleSession():
     self.delay = 0.1
     self.trail = default_trail
     self.sleep = sleep_function
-    self.living_things_spawned = []
+    self.living_things_selected = {}
 
 class Minecraft():
   def __init__(self):
@@ -63,6 +63,11 @@ class Minecraft():
 
   def living_entity_reset_task(self, entity_uuid, task):
     self._m().entity.resetTaskV2(entity_uuid, task.task_name)
+
+  def get_all_entities_in_bounding_box(self, cube_corner_1, cube_corner_2):
+    return self._m().entity.getAllInBoundingCube(
+      cube_corner_1.x, cube_corner_1.y, cube_corner_1.z,
+      cube_corner_2.x, cube_corner_2.y, cube_corner_2.z)
 
   def get_player_rotation_degrees(self):
     return int(self._m().player.getRotation())
@@ -195,10 +200,17 @@ def _draw_thing(position, *args):
     entity = minecraft.spawn_entity(
       position.x, position.y, position.z,
       args[0])
-    turtle.living_things_spawned.append((name_to_living[entity.type], entity.uuid))
+    _select_entity(entity)
     _draw_thing(position, block.AIR)
   else:
     raise Exception("don't know what to do with " + str(args))
+
+def _select_entity(entity):
+  turtle = minecraft.turtle_session
+  if entity.type in name_to_living:
+    turtle.living_things_selected[entity.uuid] = name_to_living[entity.type]
+  else:
+    turtle.living_things_selected[entity.uuid] = None
 
 def _move(x,y,z):
   turtle = minecraft.turtle_session
@@ -249,24 +261,48 @@ def pen_up(*args):
 
 def living_things():
   turtle = minecraft.turtle_session
-  return turtle.living_things_spawned
+  return turtle.living_things_selected
 
 def _select_all_living_of_type(task, entities):
-  return filter(lambda e: e[0].name == task.entity_name, entities)
+  return filter(lambda entity_uuid: entities[entity_uuid] == name_to_living[task.entity_name], entities)
 
 def start_task(task, selector=_select_all_living_of_type):
   def all_tasks_at_once(mc):
-    for entity in _select_all_living_of_type(task, living_things()):
-      entity_uuid = entity[1]
+    for entity_uuid in _select_all_living_of_type(task, living_things()):
       mc.living_entity_start_task(entity_uuid, task)
   minecraft.batch(all_tasks_at_once)
 
 def reset_task(task, selector=_select_all_living_of_type):
   def all_tasks_at_once(mc):
-    for entity in _select_all_living_of_type(task, living_things()):
-      entity_uuid = entity[1]
+    for entity_uuid in _select_all_living_of_type(task, living_things()):
       mc.living_entity_reset_task(entity_uuid, task)
   minecraft.batch(all_tasks_at_once)
+
+def current_position():
+  return minecraft.get_player_tile_pos()
+
+HORIZON_DISTANCE = 32*16 # 32 chunks * 16 blocks / chunk
+
+def cube_centered_on(position, center_to_edge_length=HORIZON_DISTANCE):
+  x1 = position.x - center_to_edge_length
+  y1 = max(1, position.y - center_to_edge_length)
+  z1 = position.z - center_to_edge_length
+
+  x2 = position.x + center_to_edge_length
+  y2 = min(254, position.y + center_to_edge_length)
+  z2 = position.z + center_to_edge_length
+
+  return (Position(x1, y1, z1), Position(x2, y2, z2))
+
+def nearby():
+  return cube_centered_on(current_position(), center_to_edge_length=HORIZON_DISTANCE)
+
+def select_living_things(cube_corners):
+  results = minecraft.get_all_entities_in_bounding_box(cube_corners[0], cube_corners[1])
+  for entity in results:
+    _select_entity(entity)
+
+# select_living_things(cube_from_point(current_position(), HORIZON_DISTANCE)))
 
 # path of blocks
 #  what if it's sand and the sand falls?

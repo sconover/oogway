@@ -392,10 +392,10 @@ class TestUnit(unittest.TestCase):
         forward()
         forward()
 
-        self.assertEqual([
-            (living.OCELOT, "uuid1"),
-            (living.OCELOT, "uuid2")
-        ], living_things())
+        self.assertEqual({
+            "uuid1": living.OCELOT,
+            "uuid2": living.OCELOT
+        }, living_things())
 
     def test_living_entity_tasks(self):
         self.begin_for_testing()
@@ -405,18 +405,18 @@ class TestUnit(unittest.TestCase):
         pen_down(living.WOLF)
         forward()
 
-        self.assertEqual([
-            (living.OCELOT, "uuid1"),
-            (living.OCELOT, "uuid2"),
-            (living.WOLF, "uuid3")
-        ], living_things())
+        self.assertEqual({
+            "uuid1": living.OCELOT,
+            "uuid2": living.OCELOT,
+            "uuid3": living.WOLF
+        }, living_things())
 
         start_task(living.OCELOT.SIT)
 
         self.assertEqual([
             ("uuid1", "sit"),
             ("uuid2", "sit")
-        ], self.game.entity.tasks_in_progress) # by default, only ocelots are selected
+        ], sorted(self.game.entity.tasks_in_progress)) # by default, only ocelots are selected
 
         reset_task(living.OCELOT.SIT)
 

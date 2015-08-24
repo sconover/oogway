@@ -130,6 +130,8 @@ class TilesResult():
                     block_representation = ">"
                 elif facing == block.PISTON.FACING_WEST:
                     block_representation = "<"
+            elif block_type is block.AIR:
+                block_representation = "_"
             else:
                 block_representation = block_type.name[0].upper()
             xz[z_offset][x_offset] = block_representation
@@ -335,6 +337,21 @@ def forward():
     _move_relative(position_diff.x, position_diff.y, position_diff.z)
 
 def pen_down(*args):
+    """Change the type of trail the turtle is leaving behind.
+
+    >>> begin()
+    >>> forward()
+    >>> forward()
+    >>> pen_down(block.STONE)
+    >>> forward()
+    >>> forward()
+    >>> get_tiles()
+    G
+    G
+    S
+    S
+    v
+    """
     turtle = minecraft.turtle_session
     turtle.trail = args
 
@@ -351,6 +368,21 @@ def pen_down(*args):
 #
 # *** ...or just make a batch endpoint ***
 def pen_up(*args):
+    """Change the type of trail the turtle is leaving behind to be air blocks.
+
+    >>> begin()
+    >>> forward()
+    >>> forward()
+    >>> pen_up()
+    >>> forward()
+    >>> forward()
+    >>> get_tiles()
+    G
+    G
+    _
+    _
+    v
+    """
     turtle = minecraft.turtle_session
     turtle.trail = [block.AIR] # this is destructive.
 

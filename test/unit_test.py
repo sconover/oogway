@@ -1,4 +1,4 @@
-import unittest, os, sys
+import unittest, doctest, os, sys
 
 this_dir = os.path.dirname(os.path.realpath(__file__))
 mcgamedata_relative_path = os.path.join(this_dir, "../../mcgamedata")
@@ -7,8 +7,9 @@ turtle_path = os.path.join(this_dir, "../")
 sys.path.append(mcgamedata_relative_path)
 sys.path.append(turtle_path)
 
+import oogway.turtle
 from oogway.turtle import init, chat, begin, forward, up, right, left, \
-    pen_down, pen_up, delay, down, living_things, start_task, reset_task
+    pen_down, pen_up, delay, down, living_things, start_task, reset_task, TilesResult
 from mcgamedata import block, living
 
 class Vector():
@@ -83,29 +84,33 @@ class FakeMcpi():
     def endBatch(this):
         pass
 
+# extracted so we can reuse with doctests
+def setupTest(targetTestInstance):
+    game = FakeMcpi(FakeMcpiPlayer(3, Vector(100,200,300)))
+
+    def connect():
+        return game
+
+    slept = []
+    def fake_sleep(interval):
+        slept.append(interval)
+
+    targetTestInstance.game = game
+    targetTestInstance.connect = connect
+    targetTestInstance.slept = slept
+
+    init(targetTestInstance.connect, "papadapadapa")
+
+    def begin_for_testing(start_distance_from_player=0):
+        begin(start_distance_from_player=start_distance_from_player,
+            default_trail=[block.GOLD_BLOCK],
+            sleep_function=fake_sleep)
+
+    targetTestInstance.begin_for_testing = begin_for_testing
+
 class TestUnit(unittest.TestCase):
     def setUp(self):
-        game = FakeMcpi(FakeMcpiPlayer(3, Vector(100,200,300)))
-
-        def connect():
-            return game
-
-        slept = []
-        def fake_sleep(interval):
-            slept.append(interval)
-
-        self.game = game
-        self.connect = connect
-        self.slept = slept
-
-        init(self.connect, "papadapadapa")
-
-        def begin_for_testing(start_distance_from_player=0):
-            begin(start_distance_from_player=start_distance_from_player,
-                default_trail=[block.GOLD_BLOCK],
-                sleep_function=fake_sleep)
-
-        self.begin_for_testing = begin_for_testing
+        setupTest(self)
 
     def test_chat(self):
         chat("hi")
@@ -417,5 +422,60 @@ class TestUnit(unittest.TestCase):
 
         self.assertEqual([], self.game.entity.tasks_in_progress)
 
+    def test_tile_result_repr(self):
+        self.assertEqual(
+            "^\n" +
+            "v", TilesResult({
+            (100,200,300): (block.PISTON, block.PISTON.FACING_NORTH),
+            (100,200,301): (block.PISTON, block.PISTON.FACING_SOUTH)
+        }).__repr__())
+
+        self.assertEqual(
+            "G\n" +
+            "G\n" +
+            "v", TilesResult({
+            (100,200,300): (block.GOLD_BLOCK),
+            (100,200,301): (block.GOLD_BLOCK),
+            (100,200,302): (block.PISTON, block.PISTON.FACING_SOUTH)
+        }).__repr__())
+
+        self.assertEqual(
+            "G\n" +
+            "G G >", TilesResult({
+            (100,200,300): (block.GOLD_BLOCK),
+            (100,200,301): (block.GOLD_BLOCK),
+            (101,200,301): (block.GOLD_BLOCK),
+            (102,200,301): (block.PISTON, block.PISTON.FACING_EAST)
+        }).__repr__())
+
+        self.assertEqual(
+            "    G\n" +
+            "< G G", TilesResult({
+            (100,200,300): (block.GOLD_BLOCK),
+            (100,200,301): (block.GOLD_BLOCK),
+            ( 99,200,301): (block.GOLD_BLOCK),
+            ( 98,200,301): (block.PISTON, block.PISTON.FACING_WEST)
+        }).__repr__())
+
+    # def test_turtle_doctest_outputchecker():
+
+
+# class TurtleOutputChecker(doctest.OutputChecker):
+#     def check_output(want, got, optionflags):
+
+
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.defaultTestLoader.loadTestsFromTestCase(TestUnit)
+    # print dir(unittest.defaultTestLoader)
+    # print doctest.DocTestSuite(oogway.turtle, setUp=TestUnit.setUp)._tests
+    # # unittest.defaultTestLoader.loadTestsFromTestCase(doctest.DocTestSuite(oogway.turtle))
+
+    os.environ['TEST'] = "true"
+
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(TestUnit))
+    suite.addTest(doctest.DocTestSuite(oogway.turtle, setUp=setupTest, optionflags=doctest.ELLIPSIS))
+    # unittest.defaultTestLoader.loadTestsFromTestCase(suite)
+    # unittest.main(defaultTest=suite)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    # suite.run()

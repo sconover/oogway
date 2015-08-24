@@ -1,3 +1,4 @@
+import sys, os
 from mcgamedata import block, block_definition, living, living_definition
 from collections import namedtuple
 from time import sleep
@@ -8,10 +9,14 @@ class TurtleSession():
     def __init__(self, position, direction, default_trail, sleep_function):
         self.position = position
         self.direction = direction
-        self.delay = 0.1
+        if os.environ['TEST'] != None:
+            self.delay = 0
+        else:
+            self.delay = 0.1
         self.trail = default_trail
         self.sleep = sleep_function
         self.living_things_selected = {}
+        self.tiles = {}
 
 class Minecraft():
     def __init__(self):
@@ -78,6 +83,69 @@ class Minecraft():
 
     def chat(self, message):
         self._m().postToChat(message)
+        return ChatResult(message)
+
+class ChatResult():
+    def __init__(self, message):
+        self.message = message
+
+    def __repr__(self):
+        return "[was broadcast to all players] " + self.message
+
+class TilesResult():
+    def __init__(self, tiles):
+        self.tiles = tiles
+
+    def __repr__(self):
+        # return "tiles " + str(self.tiles)
+        min_x = sys.maxint
+        min_z = sys.maxint
+        max_x = 0
+        max_z = 0
+        for coord in self.tiles:
+            min_x = int(min(min_x, coord[0]))
+            max_x = int(max(max_x, coord[0]))
+            min_z = int(min(min_z, coord[2]))
+            max_z = int(max(max_z, coord[2]))
+
+        xz = [None] * (max_z-min_z+1)
+        for coord in self.tiles:
+            x_offset = int(coord[0] - min_x)
+            z_offset = int(coord[2] - min_z)
+            if xz[z_offset] == None:
+                xz[z_offset] = [None] * (max_x-min_x+1)
+
+            content = self.tiles[coord]
+            block_representation = None
+            block_type = content
+            if type(block_type) == tuple:
+                block_type = block_type[0]
+            if block_type is block.PISTON:
+                facing = content[1]
+                if facing == block.PISTON.FACING_SOUTH:
+                    block_representation = "v"
+                elif facing == block.PISTON.FACING_NORTH:
+                    block_representation = "^"
+                elif facing == block.PISTON.FACING_EAST:
+                    block_representation = ">"
+                elif facing == block.PISTON.FACING_WEST:
+                    block_representation = "<"
+            else:
+                block_representation = block_type.name[0].upper()
+            xz[z_offset][x_offset] = block_representation
+
+        result = ""
+        for z_row in xz:
+            row_str = ""
+            for x_cell in z_row:
+                if len(row_str) > 0:
+                    row_str += " "
+                if x_cell == None:
+                    row_str += " "
+                else:
+                    row_str += x_cell
+            result += row_str.rstrip() + "\n"
+        return result.rstrip()
 
 minecraft = Minecraft()
 
@@ -90,13 +158,6 @@ for living_type in living.ALL:
     name_to_living[living_type.name] = living_type
 
 def init(mcpi_minecraft_connect_function, player=None):
-    """Foo about init
-
-            init(mcpi_minecraft_connect_function, player=None)
-
-            def mode_code():
-                    print "hello"
-    """
     minecraft.mcpi_minecraft_connect_function = mcpi_minecraft_connect_function
     if player:
         minecraft.player_name = player
@@ -106,9 +167,20 @@ def init(mcpi_minecraft_connect_function, player=None):
     minecraft.turtle_session = None
 
 def chat(message):
-    minecraft.chat(message)
+    """Broadcast a message to all minecraft players.
+
+    >>> chat("hi everyone")
+    [was broadcast to all players] hi everyone
+    """
+    return minecraft.chat(message)
 
 def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_function=sleep):
+    """Create a new turtle.
+
+    >>> begin()
+    >>> get_tiles()
+    v
+    """
     pos = minecraft.get_player_tile_pos()
     rotation_degrees = minecraft.get_player_rotation_degrees()
     if rotation_degrees < 0:
@@ -138,11 +210,16 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
         sleep_function)
     _draw_turtle()
 
+def get_tiles():
+    turtle = minecraft.turtle_session
+    return TilesResult(turtle.tiles)
+
 def _draw_turtle():
     turtle = minecraft.turtle_session
     minecraft.set_block(
         turtle.position.x, turtle.position.y, turtle.position.z,
         block.PISTON, _turtle_facing())
+    turtle.tiles[(turtle.position.x, turtle.position.y, turtle.position.z)] = (block.PISTON, _turtle_facing())
 
 def _facing_based_on_yaw(yaw):
     turtle = minecraft.turtle_session
@@ -203,6 +280,7 @@ def _draw_thing(position, *args):
         minecraft.set_block(
             position.x, position.y, position.z,
             *args)
+        turtle.tiles[(position.x, position.y, position.z)] = tuple(args)
     elif isinstance(args[0], living_definition.LivingDefinition):
         entity = minecraft.spawn_entity(
             position.x, position.y, position.z,
@@ -240,6 +318,16 @@ def delay(seconds):
     minecraft.turtle_session.delay = seconds
 
 def forward():
+    """Move the turtle forward (in its current direction).
+
+    >>> begin()
+    >>> forward()
+    >>> forward()
+    >>> get_tiles()
+    G
+    G
+    v
+    """
     turtle = minecraft.turtle_session
     # print turtle.direction
     position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
@@ -337,6 +425,73 @@ def select_living_things(cube_corners):
 # ...good way to teach predicate logic
 
 def right(degrees):
+    """Turn the turtle to the right, the given number of degrees.
+
+    A complete turn (a circle) has 360 degrees, so:
+    - 90 degrees is a "right turn"
+    - 180 degrees (a half circle) turns the turtle around
+    - 270 degrees (3/4th of a circle) turns the turtle around so that
+      she is actually making a "left turn".
+    - 360 degrees (a whole circle) turns the turtle all the way around,
+      which points her in the same direction as before.
+    - 45 degrees is a right-diagonal move (between straight forward and a right turn)
+
+    >>> begin()
+    >>> forward()
+    >>> forward()
+    >>> right(90) # face right
+    >>> forward()
+    >>> forward()
+    >>> get_tiles()
+        G
+        G
+    < G G
+
+    >>> begin()
+    >>> forward()
+    >>> forward()
+    >>> right(180) # face backwards
+    >>> forward()
+    >>> forward()
+    >>> get_tiles()
+    ^
+    G
+    G
+
+    >>> begin()
+    >>> forward()
+    >>> forward()
+    >>> right(270) # face left (!)
+    >>> forward()
+    >>> forward()
+    >>> get_tiles()
+    G
+    G
+    G G >
+
+    >>> begin()
+    >>> forward()
+    >>> forward()
+    >>> right(360) # ...turn ALL the way around, meaning she's back facing the same direction as before
+    >>> forward()
+    >>> forward()
+    >>> get_tiles()
+    G
+    G
+    G
+    G
+    v
+
+    >>> begin()
+    >>> forward()
+    >>> right(45) # ...move in a diagonal (right/front)
+    >>> forward()
+    >>> forward()
+    >>> get_tiles()
+        G
+      G G
+    <
+    """
     turtle = minecraft.turtle_session
 
     turtle.direction.yaw += degrees

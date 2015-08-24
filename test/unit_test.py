@@ -466,25 +466,10 @@ class TestUnit(unittest.TestCase):
             ( 98,200,301): (block.PISTON, block.PISTON.FACING_WEST)
         }).__repr__())
 
-    # def test_turtle_doctest_outputchecker():
-
-
-# class TurtleOutputChecker(doctest.OutputChecker):
-#     def check_output(want, got, optionflags):
-
-
 if __name__ == '__main__':
-    # unittest.defaultTestLoader.loadTestsFromTestCase(TestUnit)
-    # print dir(unittest.defaultTestLoader)
-    # print doctest.DocTestSuite(oogway.turtle, setUp=TestUnit.setUp)._tests
-    # # unittest.defaultTestLoader.loadTestsFromTestCase(doctest.DocTestSuite(oogway.turtle))
-
     os.environ['TEST'] = "true"
 
     suite = unittest.TestSuite()
     suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(TestUnit))
     suite.addTest(doctest.DocTestSuite(oogway.turtle, setUp=setupTest, optionflags=doctest.ELLIPSIS))
-    # unittest.defaultTestLoader.loadTestsFromTestCase(suite)
-    # unittest.main(defaultTest=suite)
     unittest.TextTestRunner(verbosity=2).run(suite)
-    # suite.run()

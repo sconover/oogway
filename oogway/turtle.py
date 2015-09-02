@@ -149,7 +149,7 @@ class TilesResult():
             result += row_str.rstrip() + "\n"
         return result.rstrip()
 
-minecraft = Minecraft()
+MC = Minecraft()
 
 name_to_block = {}
 for block_type in block.ALL:
@@ -160,13 +160,13 @@ for living_type in living.ALL:
     name_to_living[living_type.name] = living_type
 
 def init(mcpi_minecraft_connect_function, player=None):
-    minecraft.mcpi_minecraft_connect_function = mcpi_minecraft_connect_function
+    MC.mcpi_minecraft_connect_function = mcpi_minecraft_connect_function
     if player:
-        minecraft.player_name = player
-    if minecraft.is_connected():
-        minecraft.reconnect()
+        MC.player_name = player
+    if MC.is_connected():
+        MC.reconnect()
 
-    minecraft.turtle_session = None
+    MC.turtle_session = None
 
 def chat(message):
     """Broadcast a message to all minecraft players.
@@ -174,7 +174,7 @@ def chat(message):
     >>> chat("hi everyone")
     [was broadcast to all players] hi everyone
     """
-    return minecraft.chat(message)
+    return MC.chat(message)
 
 def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_function=sleep):
     """Create a new turtle, about 5 blocks out from where the player is facing.
@@ -183,8 +183,8 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
     >>> get_tiles()
     v
     """
-    pos = minecraft.get_player_tile_pos()
-    rotation_degrees = minecraft.get_player_rotation_degrees()
+    pos = MC.get_player_tile_pos()
+    rotation_degrees = MC.get_player_rotation_degrees()
     if rotation_degrees < 0:
         rotation_degrees = 360 + rotation_degrees
 
@@ -205,7 +205,7 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
     start_x = pos.x + position_diff.x
     start_y = pos.y + position_diff.y
     start_z = pos.z + position_diff.z
-    minecraft.turtle_session = TurtleSession(
+    MC.turtle_session = TurtleSession(
         Position(start_x, start_y, start_z),
         Direction(yaw, horizon_pitch, 0),
         default_trail,
@@ -213,18 +213,18 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
     _draw_turtle()
 
 def get_tiles():
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
     return TilesResult(turtle.tiles)
 
 def _draw_turtle():
-    turtle = minecraft.turtle_session
-    minecraft.set_block(
+    turtle = MC.turtle_session
+    MC.set_block(
         turtle.position.x, turtle.position.y, turtle.position.z,
         block.PISTON, _turtle_facing())
     turtle.tiles[(turtle.position.x, turtle.position.y, turtle.position.z)] = (block.PISTON, _turtle_facing())
 
 def _facing_based_on_yaw(yaw):
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
 
     facing = None
     if yaw >= 0:
@@ -257,7 +257,7 @@ def _opposite_facing(facing):
         return block.PISTON.FACING_DOWN
 
 def _turtle_facing():
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
 
     facing_from_yaw = _facing_based_on_yaw(turtle.direction.yaw)
     facing = facing_from_yaw
@@ -276,15 +276,15 @@ def _turtle_facing():
     return facing
 
 def _draw_thing(position, *args):
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
 
     if isinstance(args[0], block_definition.BlockDefinition):
-        minecraft.set_block(
+        MC.set_block(
             position.x, position.y, position.z,
             *args)
         turtle.tiles[(position.x, position.y, position.z)] = tuple(args)
     elif isinstance(args[0], living_definition.LivingDefinition):
-        entity = minecraft.spawn_entity(
+        entity = MC.spawn_entity(
             position.x, position.y, position.z,
             args[0])
         _select_entity(entity)
@@ -293,14 +293,14 @@ def _draw_thing(position, *args):
         raise Exception("don't know what to do with " + str(args))
 
 def _select_entity(entity):
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
     if entity.type in name_to_living:
         turtle.living_things_selected[entity.uuid] = name_to_living[entity.type]
     else:
         turtle.living_things_selected[entity.uuid] = None
 
 def _move(x,y,z):
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
     turtle.sleep(turtle.delay)
     a = turtle.position
     b = Position(x,y,z)
@@ -310,14 +310,14 @@ def _move(x,y,z):
     _draw_turtle()
 
 def _move_relative(x_diff, y_diff, z_diff):
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
     _move(
             turtle.position.x + x_diff,
             turtle.position.y + y_diff,
             turtle.position.z + z_diff)
 
 def delay(seconds):
-    minecraft.turtle_session.delay = seconds
+    MC.turtle_session.delay = seconds
 
 def forward():
     """Move the turtle forward (in its current direction).
@@ -330,7 +330,7 @@ def forward():
     G
     v
     """
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
     # print turtle.direction
     position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
     # print position_diff
@@ -352,7 +352,7 @@ def pen_down(*args):
     S
     v
     """
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
     turtle.trail = args
 
 # TODO: we really need to replace the turtle with the block that was there (exactly as it was)
@@ -383,11 +383,11 @@ def pen_up(*args):
     _
     v
     """
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
     turtle.trail = [block.AIR] # this is destructive.
 
 def living_things():
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
     return turtle.living_things_selected
 
 def _select_all_living_of_type(task, entities):
@@ -397,16 +397,16 @@ def start_task(task, selector=_select_all_living_of_type):
     def all_tasks_at_once(mc):
         for entity_uuid in _select_all_living_of_type(task, living_things()):
             mc.living_entity_start_task(entity_uuid, task)
-    minecraft.batch(all_tasks_at_once)
+    MC.batch(all_tasks_at_once)
 
 def reset_task(task, selector=_select_all_living_of_type):
     def all_tasks_at_once(mc):
         for entity_uuid in _select_all_living_of_type(task, living_things()):
             mc.living_entity_reset_task(entity_uuid, task)
-    minecraft.batch(all_tasks_at_once)
+    MC.batch(all_tasks_at_once)
 
 def current_position():
-    return minecraft.get_player_tile_pos()
+    return MC.get_player_tile_pos()
 
 HORIZON_DISTANCE = 32*16 # 32 chunks * 16 blocks / chunk
 
@@ -425,7 +425,7 @@ def nearby():
     return cube_centered_on(current_position(), center_to_edge_length=HORIZON_DISTANCE)
 
 def select_living_things(cube_corners):
-    results = minecraft.get_all_entities_in_bounding_box(cube_corners[0], cube_corners[1])
+    results = MC.get_all_entities_in_bounding_box(cube_corners[0], cube_corners[1])
     for entity in results:
         _select_entity(entity)
 
@@ -524,7 +524,7 @@ def right(degrees):
       G G
     <
     """
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
 
     turtle.direction.yaw += degrees
     if turtle.direction.yaw >= 360:
@@ -537,7 +537,7 @@ def left(degrees):
     right(-1 * degrees)
 
 def up(degrees):
-    turtle = minecraft.turtle_session
+    turtle = MC.turtle_session
 
     turtle.direction.pitch -= degrees
     if turtle.direction.pitch >= 360:

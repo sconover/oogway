@@ -9,7 +9,7 @@ class TurtleSession():
     def __init__(self, position, direction, default_trail, sleep_function):
         self.position = position
         self.direction = direction
-        if os.environ['TEST'] != None:
+        if "TEST" in os.environ:
             self.delay = 0
         else:
             self.delay = 0.1

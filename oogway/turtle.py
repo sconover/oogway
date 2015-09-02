@@ -177,7 +177,7 @@ def chat(message):
     return minecraft.chat(message)
 
 def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_function=sleep):
-    """Create a new turtle.
+    """Create a new turtle, about 5 blocks out from where the player is facing.
 
     >>> begin()
     >>> get_tiles()

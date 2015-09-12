@@ -143,8 +143,7 @@ class TestUnit(unittest.TestCase):
 
     def test_forward(self):
         self.begin_for_testing()
-        forward()
-        forward()
+        forward(2)
 
         self.assertEqual({
             (100,200,300): "gold_block",
@@ -155,16 +154,15 @@ class TestUnit(unittest.TestCase):
     def test_delay(self):
         self.begin_for_testing()
         delay(1)
-        forward()
-        forward()
+        forward(2)
         delay(2)
-        forward()
+        forward(1)
 
         self.assertEqual([1,1,2], self.slept)
 
     def test_right_90(self):
         self.begin_for_testing()
-        forward()
+        forward(1)
         right(90)
 
         self.assertEqual({
@@ -172,8 +170,7 @@ class TestUnit(unittest.TestCase):
             (100,200,301): ("piston", {"facing":"west"})
         }, self.game.tiles)
 
-        forward()
-        forward()
+        forward(2)
 
         self.assertEqual({
             (100,200,300): "gold_block",
@@ -184,7 +181,7 @@ class TestUnit(unittest.TestCase):
 
     def test_left_90(self):
         self.begin_for_testing()
-        forward()
+        forward(1)
         left(90)
 
         self.assertEqual({
@@ -192,8 +189,7 @@ class TestUnit(unittest.TestCase):
             (100,200,301): ("piston", {"facing":"east"})
         }, self.game.tiles)
 
-        forward()
-        forward()
+        forward(2)
 
         self.assertEqual({
             (100,200,300): "gold_block",
@@ -204,7 +200,7 @@ class TestUnit(unittest.TestCase):
 
     def test_up_90(self):
         self.begin_for_testing()
-        forward()
+        forward(1)
         up(90)
 
         self.assertEqual({
@@ -212,8 +208,7 @@ class TestUnit(unittest.TestCase):
             (100,200,301): ("piston", {"facing":"up"})
         }, self.game.tiles)
 
-        forward()
-        forward()
+        forward(2)
 
         self.assertEqual({
             (100,200,300): "gold_block",
@@ -224,7 +219,7 @@ class TestUnit(unittest.TestCase):
 
     def test_down_90(self):
         self.begin_for_testing()
-        forward()
+        forward(1)
         down(90)
 
         self.assertEqual({
@@ -232,8 +227,7 @@ class TestUnit(unittest.TestCase):
             (100,200,301): ("piston", {"facing":"down"})
         }, self.game.tiles)
 
-        forward()
-        forward()
+        forward(2)
 
         self.assertEqual({
             (100,200,300): "gold_block",
@@ -298,10 +292,7 @@ class TestUnit(unittest.TestCase):
     def test_turn_45_degrees(self):
         self.begin_for_testing()
         left(45)
-        forward()
-        forward()
-        forward()
-        forward()
+        forward(4)
 
         self.assertEqual({
             (100,200,300): "gold_block",
@@ -312,12 +303,7 @@ class TestUnit(unittest.TestCase):
     def test_turn_22_degrees(self):
         self.begin_for_testing()
         left(22)
-        forward()
-        forward()
-        forward()
-        forward()
-        forward()
-        forward()
+        forward(6)
 
         self.assertEqual({
             (100,200,300): "gold_block",
@@ -330,14 +316,11 @@ class TestUnit(unittest.TestCase):
 
     def test_pen_down_pen_up(self):
         self.begin_for_testing()
-        forward()
-        forward()
+        forward(2)
         pen_up()
-        forward()
-        forward()
+        forward(2)
         pen_down(block.GOLD_BLOCK)
-        forward()
-        forward()
+        forward(2)
 
         self.assertEqual({
             (100,200,300): "gold_block",
@@ -354,13 +337,11 @@ class TestUnit(unittest.TestCase):
         # future: enhance the library so that this isn't destructive
 
         self.begin_for_testing()
-        forward()
-        forward()
-        forward()
+        forward(3)
 
         self.begin_for_testing()
         pen_up()
-        forward()
+        forward(1)
 
         self.assertEqual({
             (100,200,300): "air",
@@ -372,8 +353,7 @@ class TestUnit(unittest.TestCase):
     def test_spawn_entity(self):
         self.begin_for_testing()
         pen_down(living.OCELOT)
-        forward()
-        forward()
+        forward(2)
 
         self.assertEqual({
             (100,200,300): "air",
@@ -389,8 +369,7 @@ class TestUnit(unittest.TestCase):
     def test_track_spawned_entities(self):
         self.begin_for_testing()
         pen_down(living.OCELOT)
-        forward()
-        forward()
+        forward(2)
 
         self.assertEqual({
             "uuid1": living.OCELOT,
@@ -400,10 +379,9 @@ class TestUnit(unittest.TestCase):
     def test_living_entity_tasks(self):
         self.begin_for_testing()
         pen_down(living.OCELOT)
-        forward()
-        forward()
+        forward(2)
         pen_down(living.WOLF)
-        forward()
+        forward(1)
 
         self.assertEqual({
             "uuid1": living.OCELOT,

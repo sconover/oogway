@@ -319,32 +319,28 @@ def _move_relative(x_diff, y_diff, z_diff):
 def delay(seconds):
     MC.turtle_session.delay = seconds
 
-def forward():
+def forward(distance):
     """Move the turtle forward (in its current direction).
 
     >>> begin()
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> get_tiles()
     G
     G
     v
     """
     turtle = MC.turtle_session
-    # print turtle.direction
-    position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
-    # print position_diff
-    _move_relative(position_diff.x, position_diff.y, position_diff.z)
+    for _ in xrange(distance):
+        position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
+        _move_relative(position_diff.x, position_diff.y, position_diff.z)
 
 def pen_down(*args):
     """Change the type of trail the turtle is leaving behind.
 
     >>> begin()
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> pen_down(block.STONE)
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> get_tiles()
     G
     G
@@ -371,11 +367,9 @@ def pen_up(*args):
     """Change the type of trail the turtle is leaving behind to be air blocks.
 
     >>> begin()
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> pen_up()
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> get_tiles()
     G
     G
@@ -469,44 +463,36 @@ def right(degrees):
     - 45 degrees is a right-diagonal move (between straight forward and a right turn)
 
     >>> begin()
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> right(90) # face right
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> get_tiles()
         G
         G
     < G G
 
     >>> begin()
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> right(180) # face backwards
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> get_tiles()
     ^
     G
     G
 
     >>> begin()
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> right(270) # face left (!)
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> get_tiles()
     G
     G
     G G >
 
     >>> begin()
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> right(360) # ...turn ALL the way around, meaning she's back facing the same direction as before
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> get_tiles()
     G
     G
@@ -515,10 +501,9 @@ def right(degrees):
     v
 
     >>> begin()
-    >>> forward()
+    >>> forward(1)
     >>> right(45) # ...move in a diagonal (right/front)
-    >>> forward()
-    >>> forward()
+    >>> forward(2)
     >>> get_tiles()
         G
       G G

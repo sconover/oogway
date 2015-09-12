@@ -334,6 +334,19 @@ def forward(distance):
         position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
         _move_relative(position_diff.x, position_diff.y, position_diff.z)
 
+def back(distance):
+    """Move the turtle backward (opposite of its current direction).
+
+    >>> begin()
+    >>> back(2)
+    >>> get_tiles()
+    ^
+    G
+    G
+    """
+    right(180)
+    forward(distance)
+
 def pen_down(*args):
     """Change the type of trail the turtle is leaving behind.
 

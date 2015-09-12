@@ -8,7 +8,7 @@ sys.path.append(mcgamedata_relative_path)
 sys.path.append(turtle_path)
 
 import oogway.turtle
-from oogway.turtle import init, chat, begin, forward, up, right, left, \
+from oogway.turtle import init, chat, begin, forward, back, up, right, left, \
     pen_down, pen_up, delay, down, living_things, start_task, reset_task, TilesResult
 from mcgamedata import block, living
 
@@ -149,6 +149,16 @@ class TestUnit(unittest.TestCase):
             (100,200,300): "gold_block",
             (100,200,301): "gold_block",
             (100,200,302): ("piston", {"facing":"south"})
+        }, self.game.tiles)
+
+    def test_back(self):
+        self.begin_for_testing()
+        back(2)
+
+        self.assertEqual({
+            (100,200,300): "gold_block",
+            (100,200,299): "gold_block",
+            (100,200,298): ("piston", {"facing":"north"})
         }, self.game.tiles)
 
     def test_delay(self):

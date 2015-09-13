@@ -151,6 +151,22 @@ class TestUnit(unittest.TestCase):
             (100,200,302): ("piston", {"facing":"south"})
         }, self.game.tiles)
 
+    def test_forward_distance_bounds_and_type(self):
+        self.begin_for_testing()
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, forward\(0\) won't work. Distance must be a whole number between 1 and 1000."):
+            forward(0)
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, forward\(1001\) won't work. Distance must be a whole number between 1 and 1000."):
+            forward(1001)
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, forward\(1.1\) won't work. Distance must be a whole number between 1 and 1000."):
+            forward(1.1)
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, forward\(abc\) won't work. Distance must be a whole number between 1 and 1000."):
+            forward('abc')
+
+
     def test_back(self):
         self.begin_for_testing()
         back(2)
@@ -160,6 +176,21 @@ class TestUnit(unittest.TestCase):
             (100,200,299): "gold_block",
             (100,200,298): ("piston", {"facing":"north"})
         }, self.game.tiles)
+
+    def test_back_distance_bounds_and_type(self):
+        self.begin_for_testing()
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, back\(0\) won't work. Distance must be a whole number between 1 and 1000."):
+            back(0)
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, back\(1001\) won't work. Distance must be a whole number between 1 and 1000."):
+            back(1001)
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, back\(1.1\) won't work. Distance must be a whole number between 1 and 1000."):
+            back(1.1)
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, back\(abc\) won't work. Distance must be a whole number between 1 and 1000."):
+            back('abc')
 
     def test_delay(self):
         self.begin_for_testing()

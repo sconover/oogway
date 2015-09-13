@@ -319,8 +319,21 @@ def _move_relative(x_diff, y_diff, z_diff):
 def delay(seconds):
     MC.turtle_session.delay = seconds
 
+min_distance = 1
+max_distance = 1000
+
+def _check_distance(distance, call_wont_work_message):
+    assert isinstance(distance, int) and distance >= min_distance and distance <= max_distance, \
+        "{} Distance must be a whole number between {} and {}.".format(
+            call_wont_work_message,
+            min_distance,
+            max_distance)
+
+
 def forward(distance):
-    """Move the turtle forward (in its current direction).
+    """Move the turtle forward a given distance (in its current direction).
+
+    Distance must be a whole number between {} and {}.
 
     >>> begin()
     >>> forward(2)
@@ -328,14 +341,19 @@ def forward(distance):
     G
     G
     v
-    """
+    """.format(min_distance, max_distance)
+
+    _check_distance(distance, "Oops, forward({}) won't work.".format(distance))
+
     turtle = MC.turtle_session
     for _ in xrange(distance):
         position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
         _move_relative(position_diff.x, position_diff.y, position_diff.z)
 
 def back(distance):
-    """Move the turtle backward (opposite of its current direction).
+    """Move the turtle backward a given distance (opposite of its current direction).
+
+    Distance must be a whole number between {} and {}.
 
     >>> begin()
     >>> back(2)
@@ -343,7 +361,10 @@ def back(distance):
     ^
     G
     G
-    """
+    """.format(min_distance, max_distance)
+
+    _check_distance(distance, "Oops, back({}) won't work.".format(distance))
+
     right(180)
     forward(distance)
 

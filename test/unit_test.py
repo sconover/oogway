@@ -220,6 +220,25 @@ class TestUnit(unittest.TestCase):
             ( 98,200,301): ("piston", {"facing":"west"})
         }, self.game.tiles)
 
+    def test_right_over_360(self):
+        self.begin_for_testing()
+        forward(1)
+        right(3690)
+
+        self.assertEqual({
+            (100,200,300): "gold_block",
+            (100,200,301): ("piston", {"facing":"west"})
+        }, self.game.tiles)
+
+        forward(2)
+
+        self.assertEqual({
+            (100,200,300): "gold_block",
+            (100,200,301): "gold_block",
+            ( 99,200,301): "gold_block",
+            ( 98,200,301): ("piston", {"facing":"west"})
+        }, self.game.tiles)
+
     def test_left_90(self):
         self.begin_for_testing()
         forward(1)
@@ -243,6 +262,25 @@ class TestUnit(unittest.TestCase):
         self.begin_for_testing()
         forward(1)
         up(90)
+
+        self.assertEqual({
+            (100,200,300): "gold_block",
+            (100,200,301): ("piston", {"facing":"up"})
+        }, self.game.tiles)
+
+        forward(2)
+
+        self.assertEqual({
+            (100,200,300): "gold_block",
+            (100,200,301): "gold_block",
+            (100,201,301): "gold_block",
+            (100,202,301): ("piston", {"facing":"up"})
+        }, self.game.tiles)
+
+    def test_up_over_360(self):
+        self.begin_for_testing()
+        forward(1)
+        up(3690)
 
         self.assertEqual({
             (100,200,300): "gold_block",

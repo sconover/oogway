@@ -553,10 +553,8 @@ def right(degrees):
     turtle = MC.turtle_session
 
     turtle.direction.yaw += degrees
-    if turtle.direction.yaw >= 360:
-            turtle.direction.yaw = turtle.direction.yaw - 360
-    elif turtle.direction.yaw < 0:
-            turtle.direction.yaw = turtle.direction.yaw + 360
+    turtle.direction.yaw = turtle.direction.yaw % 360
+
     _draw_turtle()
 
 def left(degrees):
@@ -570,10 +568,8 @@ def up(degrees):
     turtle = MC.turtle_session
 
     turtle.direction.pitch -= degrees
-    if turtle.direction.pitch >= 360:
-            turtle.direction.pitch -= 360
-    elif turtle.direction.pitch < 0:
-            turtle.direction.pitch += 360
+    turtle.direction.pitch = turtle.direction.pitch % 360
+
     _draw_turtle()
 
 def down(degrees):

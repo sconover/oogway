@@ -484,6 +484,9 @@ def select_living_things(cube_corners):
 # both, neither, either
 # ...good way to teach predicate logic
 
+def _check_degrees(degrees, call_wont_work_message):
+    assert isinstance(degrees, (int, long, float, complex)), "{} Degrees must be a number.".format(call_wont_work_message)
+
 def right(degrees):
     """Turn the turtle to the right, the given number of degrees.
 
@@ -495,6 +498,8 @@ def right(degrees):
     - 360 degrees (a whole circle) turns the turtle all the way around,
       which points her in the same direction as before.
     - 45 degrees is a right-diagonal move (between straight forward and a right turn)
+
+    Degrees must be a number.
 
     >>> begin()
     >>> forward(2)
@@ -543,6 +548,8 @@ def right(degrees):
       G G
     <
     """
+    _check_degrees(degrees, "Oops, right({}) won't work.".format(degrees))
+
     turtle = MC.turtle_session
 
     turtle.direction.yaw += degrees
@@ -553,9 +560,13 @@ def right(degrees):
     _draw_turtle()
 
 def left(degrees):
+    _check_degrees(degrees, "Oops, left({}) won't work.".format(degrees))
+
     right(-1 * degrees)
 
 def up(degrees):
+    _check_degrees(degrees, "Oops, up({}) won't work.".format(degrees))
+
     turtle = MC.turtle_session
 
     turtle.direction.pitch -= degrees
@@ -566,4 +577,6 @@ def up(degrees):
     _draw_turtle()
 
 def down(degrees):
+    _check_degrees(degrees, "Oops, down({}) won't work.".format(degrees))
+
     up(-1 * degrees)

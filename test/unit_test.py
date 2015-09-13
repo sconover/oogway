@@ -277,6 +277,21 @@ class TestUnit(unittest.TestCase):
             (100,198,301): ("piston", {"facing":"down"})
         }, self.game.tiles)
 
+    def test_turn_methods_take_valid_degrees(self):
+        self.begin_for_testing()
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, right\(abc\) won't work. Degrees must be a number."):
+            right('abc')
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, left\(abc\) won't work. Degrees must be a number."):
+            left('abc')
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, up\(abc\) won't work. Degrees must be a number."):
+            up('abc')
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, down\(abc\) won't work. Degrees must be a number."):
+            down('abc')
+
     def test_turns_and_piston_facing(self):
         self.begin_for_testing()
         self.assertEqual({(100,200,300): ("piston", {"facing":"south"})}, self.game.tiles)

@@ -1,3 +1,106 @@
+"""oogway: a python library for doing turtle graphics in Minecraft.
+
+It depends on mcgamedata, which contains metadata about
+minecraft objects, like blocks and living things, that
+oogway can use to create in a minecraft world, via pen_down().
+
+Oogway requires a specially modified version of the
+Sponge Minecraft server, and a special version of the mcpi
+client library, which oogway uses to communicate with the
+server.
+
+Style stays as close to the original LOGO turtle graphics as
+possible (see chapter 3 of Seymour Papert's book, Mindstorms).
+
+Newcomers will learn by bumping into problems: so, error checking
+is indended to be robust and error messages are helpful and
+intended to be in relatively informal, everyday english.
+
+This library, along with mcgamedata, mcpi mods, Sponge server
+mods, and the mcplaygrounds systems automation project, was
+written in order to teach a Minecraft+Python intro programming
+class to 10-year-olds.
+
+Code samples are verified as part of the unit_test.py test run
+(including the picture of the turtle below).
+
+>>> def polygon(sides, side_length):
+...     degrees = 360/sides
+...     for _ in xrange(sides):
+...         right(degrees)
+...         forward(side_length)
+>>> begin()
+>>> pen_down(block.EMERALD_BLOCK)
+>>> polygon(6, 12)                 # shell
+>>> back(8)
+>>> polygon(4, 4)                  # neck
+>>> right(90)
+>>> forward(4)
+>>> right(90)
+>>> forward(2)
+>>> right(180)
+>>> polygon(24, 1)                 # head
+>>> pen_up()
+>>> forward(11)
+>>> left(90)
+>>> forward(11)
+>>> pen_down(block.EMERALD_BLOCK)
+>>> right(45)
+>>> polygon(3, 7)                  # front-left foot
+>>> right(45)
+>>> back(1)
+>>> pen_up()
+>>> forward(20)
+>>> pen_down(block.EMERALD_BLOCK)
+>>> right(135)
+>>> polygon(3, 7)                  # front-right foot
+>>> left(45)
+>>> forward(1)
+>>> pen_up()
+>>> forward(5)
+>>> pen_down(block.EMERALD_BLOCK)
+>>> forward(1)
+>>> left(180)
+>>> polygon(3, 5)                  # back-right foot
+>>> left(90)
+>>> forward(1)
+>>> pen_up()
+>>> forward(18)
+>>> pen_down(block.EMERALD_BLOCK)
+>>> left(180)
+>>> polygon(3, 5)                  # back-left foot
+>>> get_tiles()
+            E
+        E E E                     E E E E
+    E E     E     E E E     E E E       E
+      E E   E   E       E E E           E
+          E E E             E E       E
+        E E v                 E E     E
+    E E                           E E E
+  E                                 E E E
+E                                         E
+E                                         E
+E                                         E           E E E E
+E                                         E         E         E
+E                                         E E E E E           E
+E                                         E       E             E
+E                                         E                     E
+E                                         E       E             E
+E                                         E E E E E           E
+E                                         E         E         E
+E                                         E           E E E E
+E                                         E
+E E                                     E E
+  E E                               E E
+      E E                       E E E E E
+          E                 E E E       E
+  E E E E E E E E         E E           E
+    E     E     E E   E E     E       E
+      E   E         E           E     E
+      E E                         E   E
+        E                           E
+"""
+
 import sys, os
 from mcgamedata import block, block_definition, block_property, living, living_definition
 from collections import namedtuple
@@ -131,7 +234,7 @@ class TilesResult():
                 elif facing == block.PISTON.FACING_WEST:
                     block_representation = "<"
             elif block_type is block.AIR:
-                block_representation = "_"
+                block_representation = " "
             else:
                 block_representation = block_type.name[0].upper()
             xz[z_offset][x_offset] = block_representation
@@ -445,13 +548,7 @@ def pen_down(*args):
 
     Example: pen_down(block.FLOWER_POT, block.FLOWER_POT.CONTENTS_BLUE_ORCHID)
 
-    All block types: {}
-
-    All living things: {}
-
-    All block values:
-
-    {}
+    TODO: see mcgamedata for details on block and living
 
     >>> begin()
     >>> forward(2)
@@ -463,7 +560,7 @@ def pen_down(*args):
     S
     S
     v
-    """.format(all_blocks_str, all_living_things_str, all_block_types_with_property_values_str)
+    """
 
     if len(args) == 0 or args[0] not in block.ALL and args[0] not in living.ALL:
         raise AssertionError(
@@ -521,8 +618,8 @@ def pen_up():
     >>> get_tiles()
     G
     G
-    _
-    _
+    <BLANKLINE>
+    <BLANKLINE>
     v
     """
     turtle = _get_turtle_session()

@@ -600,7 +600,7 @@ class TestUnit(unittest.TestCase):
 
         self.assertEqual(
             "    G\n" +
-            "< G _", TilesResult({
+            "< G", TilesResult({
             (100,200,300): (block.GOLD_BLOCK),
             (100,200,301): (block.AIR),
             ( 99,200,301): (block.GOLD_BLOCK),

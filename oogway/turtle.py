@@ -316,7 +316,22 @@ def _move_relative(x_diff, y_diff, z_diff):
             turtle.position.y + y_diff,
             turtle.position.z + z_diff)
 
+def _is_number(x):
+    return isinstance(x, (int, long, float, complex))
+
+min_delay = 0
+max_delay = 10
+
+def _check_delay(delay_seconds, call_wont_work_message):
+    assert _is_number(delay_seconds) and delay_seconds >= min_delay and delay_seconds <= max_delay, \
+        "{} Delay seconds must be a number of seconds (such as 0.1 or 3) between {} and {}.".format(
+            call_wont_work_message,
+            min_delay,
+            max_delay)
+
 def delay(seconds):
+    _check_delay(seconds, "Oops, delay({}) won't work.".format(str(seconds)))
+
     MC.turtle_session.delay = seconds
 
 min_distance = 1
@@ -328,7 +343,6 @@ def _check_distance(distance, call_wont_work_message):
             call_wont_work_message,
             min_distance,
             max_distance)
-
 
 def forward(distance):
     """Move the turtle forward a given distance (in its current direction).
@@ -515,7 +529,7 @@ def select_living_things(cube_corners):
 # ...good way to teach predicate logic
 
 def _check_degrees(degrees, call_wont_work_message):
-    assert isinstance(degrees, (int, long, float, complex)), "{} Degrees must be a number.".format(call_wont_work_message)
+    assert _is_number(degrees), "{} Degrees must be a number.".format(call_wont_work_message)
 
 def right(degrees):
     """Turn the turtle to the right, the given number of degrees.

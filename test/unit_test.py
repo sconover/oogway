@@ -157,6 +157,9 @@ class TestUnit(unittest.TestCase):
         with self.assertRaisesRegexp(AssertionError, "Oops, forward\(0\) won't work. Distance must be a whole number between 1 and 1000."):
             forward(0)
 
+        with self.assertRaisesRegexp(AssertionError, "Oops, forward\(-1\) won't work. Distance must be a whole number between 1 and 1000."):
+            forward(-1)
+
         with self.assertRaisesRegexp(AssertionError, "Oops, forward\(1001\) won't work. Distance must be a whole number between 1 and 1000."):
             forward(1001)
 
@@ -183,6 +186,9 @@ class TestUnit(unittest.TestCase):
         with self.assertRaisesRegexp(AssertionError, "Oops, back\(0\) won't work. Distance must be a whole number between 1 and 1000."):
             back(0)
 
+        with self.assertRaisesRegexp(AssertionError, "Oops, back\(-1\) won't work. Distance must be a whole number between 1 and 1000."):
+            back(-1)
+
         with self.assertRaisesRegexp(AssertionError, "Oops, back\(1001\) won't work. Distance must be a whole number between 1 and 1000."):
             back(1001)
 
@@ -200,6 +206,18 @@ class TestUnit(unittest.TestCase):
         forward(1)
 
         self.assertEqual([1,1,2], self.slept)
+
+    def test_delay_has_proper_type_and_in_bounds(self):
+        self.begin_for_testing()
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, delay\(foo\) won't work\. Delay seconds must be a number of seconds \(such as 0.1 or 3\) between 0 and 10."):
+            delay("foo")
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, delay\(11\) won't work\. Delay seconds.*"):
+            delay(11)
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, delay\(-1\) won't work\. Delay seconds.*"):
+            delay(-1)
 
     def test_right_90(self):
         self.begin_for_testing()

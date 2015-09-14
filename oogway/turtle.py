@@ -176,10 +176,9 @@ def init(mcpi_minecraft_connect_function, player=None):
 
     MC.turtle_session = None
 
-def _check_message(message, call_wont_work_message):
+def _check_message(message, call_wont_work_message, try_this_message):
     assert isinstance(message, str) and len(message) > 0 and len(message) <= 10000, \
-        "{} The message must be a string, and not too long.".format(
-            call_wont_work_message)
+        "{} The message must be a string, and not too long.".format(call_wont_work_message) + " " + try_this_message
 
 def chat(message):
     """Broadcast a message to all minecraft players.
@@ -188,7 +187,7 @@ def chat(message):
     [was broadcast to all players] hi everyone
     """
 
-    _check_message(message, "Oops, chat({}) won't work.".format(message))
+    _check_message(message, "Oops, chat({}) won't work.".format(message), "Try this:\n\nchat(\"hello world\")")
 
     return MC.chat(message)
 
@@ -336,12 +335,12 @@ def _is_number(x):
 min_delay = 0
 max_delay = 10
 
-def _check_delay_seconds(delay_seconds, call_wont_work_message):
+def _check_delay_seconds(delay_seconds, call_wont_work_message, try_this_message):
     assert _is_number(delay_seconds) and delay_seconds >= min_delay and delay_seconds <= max_delay, \
         "{} Delay seconds must be a number of seconds (such as 0.1 or 3) between {} and {}.".format(
             call_wont_work_message,
             min_delay,
-            max_delay)
+            max_delay) + " " + try_this_message
 
 def delay(seconds):
     """Duration of pause, in seconds, between turtle moves.
@@ -363,19 +362,19 @@ def delay(seconds):
 
     delay(0.1)
     """
-    _check_delay_seconds(seconds, "Oops, delay({}) won't work.".format(str(seconds)))
+    _check_delay_seconds(seconds, "Oops, delay({}) won't work.".format(str(seconds)), "Try this:\n\ndelay(0.5)")
 
     _get_turtle_session().delay = seconds
 
 min_distance = 1
 max_distance = 1000
 
-def _check_distance(distance, call_wont_work_message):
+def _check_distance(distance, call_wont_work_message, try_this_message):
     assert isinstance(distance, int) and distance >= min_distance and distance <= max_distance, \
         "{} Distance must be a whole number between {} and {}.".format(
             call_wont_work_message,
             min_distance,
-            max_distance)
+            max_distance) + " " + try_this_message
 
 def forward(distance):
     """Move the turtle forward a given distance (in its current direction).
@@ -390,7 +389,7 @@ def forward(distance):
     v
     """.format(min_distance, max_distance)
 
-    _check_distance(distance, "Oops, forward({}) won't work.".format(distance))
+    _check_distance(distance, "Oops, forward({}) won't work.".format(distance), "Try this:\n\nforward(3)")
 
     turtle = _get_turtle_session()
     for _ in xrange(distance):
@@ -410,7 +409,7 @@ def back(distance):
     G
     """.format(min_distance, max_distance)
 
-    _check_distance(distance, "Oops, back({}) won't work.".format(distance))
+    _check_distance(distance, "Oops, back({}) won't work.".format(distance), "Try this:\n\nback(3)")
 
     right(180)
     forward(distance)
@@ -475,7 +474,8 @@ def pen_down(*args):
             "Here are all the types of blocks:\n" + \
             "".join(sorted(map(lambda b: "    " + str(b) + "\n", block.ALL))) + \
             "\nHere are all the types of living things:\n" + \
-            "".join(sorted(map(lambda l: "    " + str(l) + "\n", living.ALL))))
+            "".join(sorted(map(lambda l: "    " + str(l) + "\n", living.ALL))) +
+            "\n\nTry this:\n\npen_down(block.GOLD_BLOCK)")
 
     if len(args) > 1:
         the_type = args[0]
@@ -493,7 +493,8 @@ def pen_down(*args):
                 "Oops, pen_down(" + ", ".join(map(lambda a: str(a), args)) + ") won't work, because " + \
                 ", ".join(map(lambda v: str(v), filter(lambda v: not isinstance(v, block_property.PropertyWithValue) or v.block_property not in the_type.ALL_PROPERTIES, value_args))) + \
                 " not part of block type " + str(the_type) + "\n\n" + \
-                "Here are all the property values you can use with block type " + str(the_type) + ":\n" + all_values_str)
+                "Here are all the property values you can use with block type " + str(the_type) + ":\n" + all_values_str + \
+                "\n\nTry this:\n\npen_down(block.FLOWER_POT, block.FLOWER_POT.CONTENTS_BLUE_ORCHID)")
 
     turtle = _get_turtle_session()
     turtle.trail = args
@@ -597,8 +598,8 @@ def select_living_things(cube_corners):
 # both, neither, either
 # ...good way to teach predicate logic
 
-def _check_degrees(degrees, call_wont_work_message):
-    assert _is_number(degrees), "{} Degrees must be a number.".format(call_wont_work_message)
+def _check_degrees(degrees, call_wont_work_message, try_this_message):
+    assert _is_number(degrees), "{} Degrees must be a number.".format(call_wont_work_message) + " " + try_this_message
 
 def right(degrees):
     """Turn the turtle to the right, the given number of degrees.
@@ -661,7 +662,7 @@ def right(degrees):
       G G
     <
     """
-    _check_degrees(degrees, "Oops, right({}) won't work.".format(degrees))
+    _check_degrees(degrees, "Oops, right({}) won't work.".format(degrees), "Try this:\n\nright(90)")
 
     turtle = _get_turtle_session()
 
@@ -671,12 +672,12 @@ def right(degrees):
     _draw_turtle()
 
 def left(degrees):
-    _check_degrees(degrees, "Oops, left({}) won't work.".format(degrees))
+    _check_degrees(degrees, "Oops, left({}) won't work.".format(degrees), "Try this:\n\nleft(90)")
 
     right(-1 * degrees)
 
 def up(degrees):
-    _check_degrees(degrees, "Oops, up({}) won't work.".format(degrees))
+    _check_degrees(degrees, "Oops, up({}) won't work.".format(degrees), "Try this:\n\nup(90)")
 
     turtle = _get_turtle_session()
 
@@ -686,6 +687,6 @@ def up(degrees):
     _draw_turtle()
 
 def down(degrees):
-    _check_degrees(degrees, "Oops, down({}) won't work.".format(degrees))
+    _check_degrees(degrees, "Oops, down({}) won't work.".format(degrees), "Try this:\n\ndown(90)")
 
     up(-1 * degrees)

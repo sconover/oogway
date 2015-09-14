@@ -151,6 +151,10 @@ class TestUnit(unittest.TestCase):
         self.begin_for_testing(start_distance_from_player=5)
         self.assertEqual({(105,200,300):("piston", {"facing":"east"})}, self.game.tiles)
 
+    def test_not_begun(self):
+        with self.assertRaisesRegexp(AssertionError, re.compile("Oops, there's no current turtle.*", re.MULTILINE)):
+            forward(1)
+
     def test_forward(self):
         self.begin_for_testing()
         forward(2)

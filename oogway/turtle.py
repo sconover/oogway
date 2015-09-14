@@ -159,6 +159,12 @@ name_to_living = {}
 for living_type in living.ALL:
     name_to_living[living_type.name] = living_type
 
+def _get_turtle_session():
+    assert MC.turtle_session is not None, \
+        "Oops, there's no current turtle! You probably need to create a new turtle using the function:\n\nbegin()"
+
+    return MC.turtle_session
+
 def init(mcpi_minecraft_connect_function, player=None):
     """Start a new minecraft turtle session.
     """
@@ -223,19 +229,17 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
     _draw_turtle()
 
 def get_tiles():
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
     return TilesResult(turtle.tiles)
 
 def _draw_turtle():
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
     MC.set_block(
         turtle.position.x, turtle.position.y, turtle.position.z,
         block.PISTON, _turtle_facing())
     turtle.tiles[(turtle.position.x, turtle.position.y, turtle.position.z)] = (block.PISTON, _turtle_facing())
 
 def _facing_based_on_yaw(yaw):
-    turtle = MC.turtle_session
-
     facing = None
     if yaw >= 0:
         facing = block.PISTON.FACING_WEST
@@ -267,7 +271,7 @@ def _opposite_facing(facing):
         return block.PISTON.FACING_DOWN
 
 def _turtle_facing():
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
 
     facing_from_yaw = _facing_based_on_yaw(turtle.direction.yaw)
     facing = facing_from_yaw
@@ -286,7 +290,7 @@ def _turtle_facing():
     return facing
 
 def _draw_thing(position, *args):
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
 
     if isinstance(args[0], block_definition.BlockDefinition):
         MC.set_block(
@@ -303,14 +307,14 @@ def _draw_thing(position, *args):
         raise Exception("don't know what to do with " + str(args))
 
 def _select_entity(entity):
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
     if entity.type in name_to_living:
         turtle.living_things_selected[entity.uuid] = name_to_living[entity.type]
     else:
         turtle.living_things_selected[entity.uuid] = None
 
 def _move(x,y,z):
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
     turtle.sleep(turtle.delay)
     a = turtle.position
     b = Position(x,y,z)
@@ -320,7 +324,7 @@ def _move(x,y,z):
     _draw_turtle()
 
 def _move_relative(x_diff, y_diff, z_diff):
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
     _move(
             turtle.position.x + x_diff,
             turtle.position.y + y_diff,
@@ -361,7 +365,7 @@ def delay(seconds):
     """
     _check_delay_seconds(seconds, "Oops, delay({}) won't work.".format(str(seconds)))
 
-    MC.turtle_session.delay = seconds
+    _get_turtle_session().delay = seconds
 
 min_distance = 1
 max_distance = 1000
@@ -388,7 +392,7 @@ def forward(distance):
 
     _check_distance(distance, "Oops, forward({}) won't work.".format(distance))
 
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
     for _ in xrange(distance):
         position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
         _move_relative(position_diff.x, position_diff.y, position_diff.z)
@@ -491,7 +495,7 @@ def pen_down(*args):
                 " not part of block type " + str(the_type) + "\n\n" + \
                 "Here are all the property values you can use with block type " + str(the_type) + ":\n" + all_values_str)
 
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
     turtle.trail = args
 
 # TODO: we really need to replace the turtle with the block that was there (exactly as it was)
@@ -520,11 +524,11 @@ def pen_up():
     _
     v
     """
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
     turtle.trail = [block.AIR] # this is destructive.
 
 def living_things():
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
     return turtle.living_things_selected
 
 def _select_all_living_of_type(task, entities):
@@ -659,7 +663,7 @@ def right(degrees):
     """
     _check_degrees(degrees, "Oops, right({}) won't work.".format(degrees))
 
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
 
     turtle.direction.yaw += degrees
     turtle.direction.yaw = turtle.direction.yaw % 360
@@ -674,7 +678,7 @@ def left(degrees):
 def up(degrees):
     _check_degrees(degrees, "Oops, up({}) won't work.".format(degrees))
 
-    turtle = MC.turtle_session
+    turtle = _get_turtle_session()
 
     turtle.direction.pitch -= degrees
     turtle.direction.pitch = turtle.direction.pitch % 360

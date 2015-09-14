@@ -160,6 +160,8 @@ for living_type in living.ALL:
     name_to_living[living_type.name] = living_type
 
 def init(mcpi_minecraft_connect_function, player=None):
+    """Start a new minecraft turtle session.
+    """
     MC.mcpi_minecraft_connect_function = mcpi_minecraft_connect_function
     if player:
         MC.player_name = player

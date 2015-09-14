@@ -117,6 +117,16 @@ class TestUnit(unittest.TestCase):
         chat("there")
         self.assertEqual(["hi", "there"], self.game.chat_log)
 
+    def test_valid_chat(self):
+        with self.assertRaisesRegexp(AssertionError, "Oops, chat\(1\) won't work. The message must be a string, and not too long."):
+            chat(1)
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, chat\(\) won't work. The message must be a string, and not too long."):
+            chat("")
+
+        with self.assertRaisesRegexp(AssertionError, "Oops, chat\(" + ("X" * 20000) + "\) won't work. The message must be a string, and not too long."):
+            chat("X" * 20000)
+
     def test_begin_the_begin(self):
         self.game.player.tile_pos = Vector(100,200,300)
         self.game.player.rotation = 2

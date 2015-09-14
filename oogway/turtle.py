@@ -168,12 +168,20 @@ def init(mcpi_minecraft_connect_function, player=None):
 
     MC.turtle_session = None
 
+def _check_message(message, call_wont_work_message):
+    assert isinstance(message, str) and len(message) > 0 and len(message) <= 10000, \
+        "{} The message must be a string, and not too long.".format(
+            call_wont_work_message)
+
 def chat(message):
     """Broadcast a message to all minecraft players.
 
     >>> chat("hi everyone")
     [was broadcast to all players] hi everyone
     """
+
+    _check_message(message, "Oops, chat({}) won't work.".format(message))
+
     return MC.chat(message)
 
 def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_function=sleep):

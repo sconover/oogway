@@ -322,7 +322,7 @@ def _is_number(x):
 min_delay = 0
 max_delay = 10
 
-def _check_delay(delay_seconds, call_wont_work_message):
+def _check_delay_seconds(delay_seconds, call_wont_work_message):
     assert _is_number(delay_seconds) and delay_seconds >= min_delay and delay_seconds <= max_delay, \
         "{} Delay seconds must be a number of seconds (such as 0.1 or 3) between {} and {}.".format(
             call_wont_work_message,
@@ -330,7 +330,26 @@ def _check_delay(delay_seconds, call_wont_work_message):
             max_delay)
 
 def delay(seconds):
-    _check_delay(seconds, "Oops, delay({}) won't work.".format(str(seconds)))
+    """Duration of pause, in seconds, between turtle moves.
+
+    Slowing down the turtle is useful to see exactly what the turtle is
+    doing, especially when you're "debugging" - or, trying to figure out
+    why something you've done isn't working. A good delay in a situation
+    like this is a half-second:
+
+    delay(0.5)
+
+    On the other hand, if you're confident that a program is doing what
+    you expect it to do, you may not want to wait around. You might want
+    to have no delay at all:
+
+    delay(0)
+
+    By default, the delay is one tenth of a second:
+
+    delay(0.1)
+    """
+    _check_delay_seconds(seconds, "Oops, delay({}) won't work.".format(str(seconds)))
 
     MC.turtle_session.delay = seconds
 
@@ -382,8 +401,44 @@ def back(distance):
     right(180)
     forward(distance)
 
+block_names = sorted(map(lambda l: str(l), block.ALL))
+all_blocks_str = ", ".join(block_names)
+all_living_things_str = ", ".join(sorted(map(lambda l: str(l), living.ALL)))
+
+all_block_types_with_property_values = {}
+
+for block_def in block.ALL:
+    all_block_types_with_property_values[str(block_def)] = map(lambda p: map(lambda v: str(v), p.all_values), block_def.ALL_PROPERTIES)
+
+all_block_types_with_property_values_str = ""
+for block_name in block_names:
+    if len(all_block_types_with_property_values_str)>0:
+        all_block_types_with_property_values_str += "\n\n"
+    all_block_types_with_property_values_str += block_name + ": \n"
+    value_groups = all_block_types_with_property_values[block_name]
+    for value_group in value_groups:
+        all_block_types_with_property_values_str += ", ".join(value_group) + "\n"
+
 def pen_down(*args):
-    """Change the type of trail the turtle is leaving behind.
+    """Change the type of trail the turtle is leaving behind. When the turtle
+    moves forward or back, it will leave this thing behind.
+
+    The first argument must be a type of block, or a type of living thing.
+
+    Example: pen_down(block.STONE)
+    Example: pen_down(living.OCELOT)
+
+    The rest of the arguments may be any number of property values for a block type.
+
+    Example: pen_down(block.FLOWER_POT, block.FLOWER_POT.CONTENTS_BLUE_ORCHID)
+
+    All block types: {}
+
+    All living things: {}
+
+    All block values:
+
+    {}
 
     >>> begin()
     >>> forward(2)
@@ -395,7 +450,7 @@ def pen_down(*args):
     S
     S
     v
-    """
+    """.format(all_blocks_str, all_living_things_str, all_block_types_with_property_values_str)
 
     if len(args) == 0 or args[0] not in block.ALL and args[0] not in living.ALL:
         raise AssertionError(

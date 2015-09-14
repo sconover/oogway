@@ -1,4 +1,4 @@
-import unittest, doctest, os, sys
+import unittest, doctest, os, sys, re
 
 this_dir = os.path.dirname(os.path.realpath(__file__))
 mcgamedata_relative_path = os.path.join(this_dir, "../../mcgamedata")
@@ -425,6 +425,43 @@ class TestUnit(unittest.TestCase):
             (100,200,305): "gold_block",
             (100,200,306): ("piston", {"facing":"south"})
         }, self.game.tiles)
+
+    def test_pen_down_invalid_turtle_trail_type(self):
+        self.begin_for_testing()
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("Oops, pen_down\(\) won't work\.", re.MULTILINE)):
+            pen_down()
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("Trail must be a type of block, or a type of living thing, along with any properties\.", re.MULTILINE)):
+            pen_down()
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("^Example 1: pen_down\(block.GOLD_BLOCK\)", re.MULTILINE)):
+            pen_down()
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("^Example 2: pen_down\(block\.FLOWER_POT, block\.FLOWER_POT\.CONTENTS_BLUE_ORCHID\)", re.MULTILINE)):
+            pen_down()
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("^    block\.GOLD_BLOCK", re.MULTILINE)):
+            pen_down()
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("^    living\.OCELOT", re.MULTILINE)):
+            pen_down()
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("Oops, pen_down\(foo, bar, 2\) won't work\.", re.MULTILINE)):
+            pen_down("foo", "bar", 2)
+
+    def test_pen_down_invalid_turtle_trail_property(self):
+        self.begin_for_testing()
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("Oops, pen_down\(block\.FLOWER_POT, block.QUARTZ_STAIRS\.FACING_NORTH\) won't work, " + \
+            "because block\.QUARTZ_STAIRS.FACING_NORTH not part of block type block\.FLOWER_POT", re.MULTILINE)):
+            pen_down(block.FLOWER_POT, block.QUARTZ_STAIRS.FACING_NORTH)
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("^    block\.FLOWER_POT\.CONTENTS_BLUE_ORCHID", re.MULTILINE)):
+            pen_down(block.FLOWER_POT, block.QUARTZ_STAIRS.FACING_NORTH)
+
+        with self.assertRaisesRegexp(AssertionError, re.compile("Oops, pen_down\(block.FLOWER_POT, foo, 1\) won't work, because foo, 1 not part of block type block\.FLOWER_POT", re.MULTILINE)):
+            pen_down(block.FLOWER_POT, "foo", 1)
 
     def test_show_that_pen_up_is_currently_destructive(self):
 

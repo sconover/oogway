@@ -1,5 +1,5 @@
 import sys, os
-from mcgamedata import block, block_definition, living, living_definition
+from mcgamedata import block, block_definition, block_property, living, living_definition
 from collections import namedtuple
 from time import sleep
 from sphere_math import calculate_point_on_sphere
@@ -382,6 +382,36 @@ def pen_down(*args):
     S
     v
     """
+
+    if len(args) == 0 or args[0] not in block.ALL and args[0] not in living.ALL:
+        raise AssertionError(
+            "Oops, pen_down(" + ", ".join(map(lambda a: str(a), args)) + ") won't work. " + \
+            "Trail must be a type of block, or a type of living thing, along with any properties.\n\n" + \
+            "Example 1: pen_down(block.GOLD_BLOCK)\n\n" + \
+            "Example 2: pen_down(block.FLOWER_POT, block.FLOWER_POT.CONTENTS_BLUE_ORCHID)\n\n" + \
+            "Here are all the types of blocks:\n" + \
+            "".join(sorted(map(lambda b: "    " + str(b) + "\n", block.ALL))) + \
+            "\nHere are all the types of living things:\n" + \
+            "".join(sorted(map(lambda l: "    " + str(l) + "\n", living.ALL))))
+
+    if len(args) > 1:
+        the_type = args[0]
+        value_args = args[1:]
+
+        if len(filter(lambda v: isinstance(v, block_property.PropertyWithValue), value_args)) != len(value_args) or \
+                len(filter(lambda v: v.block_property in the_type.ALL_PROPERTIES, value_args)) != len(value_args):
+            all_values_str = ""
+            for p in the_type.ALL_PROPERTIES:
+                all_values_str += "\n"
+                for v in p.all_values:
+                    all_values_str += "    " + str(v) + "\n"
+
+            raise AssertionError(
+                "Oops, pen_down(" + ", ".join(map(lambda a: str(a), args)) + ") won't work, because " + \
+                ", ".join(map(lambda v: str(v), filter(lambda v: not isinstance(v, block_property.PropertyWithValue) or v.block_property not in the_type.ALL_PROPERTIES, value_args))) + \
+                " not part of block type " + str(the_type) + "\n\n" + \
+                "Here are all the property values you can use with block type " + str(the_type) + ":\n" + all_values_str)
+
     turtle = MC.turtle_session
     turtle.trail = args
 
@@ -397,7 +427,7 @@ def pen_down(*args):
 # ...or make "return the block in x direction" or "at x coords" an optional param...
 #
 # *** ...or just make a batch endpoint ***
-def pen_up(*args):
+def pen_up():
     """Change the type of trail the turtle is leaving behind to be air blocks.
 
     >>> begin()

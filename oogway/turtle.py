@@ -252,7 +252,7 @@ class TilesResult():
             result += row_str.rstrip() + "\n"
         return result.rstrip()
 
-MC = Minecraft()
+_MC = Minecraft()
 
 name_to_block = {}
 for block_type in block.ALL:
@@ -263,21 +263,21 @@ for living_type in living.ALL:
     name_to_living[living_type.name] = living_type
 
 def _get_turtle_session():
-    assert MC.turtle_session is not None, \
+    assert _MC.turtle_session is not None, \
         "Oops, there's no current turtle! You probably need to create a new turtle using the function:\n\nbegin()"
 
-    return MC.turtle_session
+    return _MC.turtle_session
 
 def init(mcpi_minecraft_connect_function, player=None):
     """Start a new minecraft turtle session.
     """
-    MC.mcpi_minecraft_connect_function = mcpi_minecraft_connect_function
+    _MC.mcpi_minecraft_connect_function = mcpi_minecraft_connect_function
     if player:
-        MC.player_name = player
-    if MC.is_connected():
-        MC.reconnect()
+        _MC.player_name = player
+    if _MC.is_connected():
+        _MC.reconnect()
 
-    MC.turtle_session = None
+    _MC.turtle_session = None
 
 def _check_message(message, call_wont_work_message, try_this_message):
     assert isinstance(message, str) and len(message) > 0 and len(message) <= 10000, \
@@ -292,7 +292,7 @@ def chat(message):
 
     _check_message(message, "Oops, chat({}) won't work.".format(message), "Try this:\n\nchat(\"hello world\")")
 
-    return MC.chat(message)
+    return _MC.chat(message)
 
 def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_function=sleep):
     """Create a new turtle, about 5 blocks out from where the player is facing.
@@ -301,8 +301,8 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
     >>> get_tiles()
     v
     """
-    pos = MC.get_player_tile_pos()
-    rotation_degrees = MC.get_player_rotation_degrees()
+    pos = _MC.get_player_tile_pos()
+    rotation_degrees = _MC.get_player_rotation_degrees()
     if rotation_degrees < 0:
         rotation_degrees = 360 + rotation_degrees
 
@@ -323,7 +323,7 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
     start_x = pos.x + position_diff.x
     start_y = pos.y + position_diff.y
     start_z = pos.z + position_diff.z
-    MC.turtle_session = TurtleSession(
+    _MC.turtle_session = TurtleSession(
         Position(start_x, start_y, start_z),
         Direction(yaw, horizon_pitch, 0),
         default_trail,
@@ -336,7 +336,11 @@ def get_tiles():
 
 def _draw_turtle():
     turtle = _get_turtle_session()
-    MC.set_block(
+
+    if not turtle.position.is_possible_in_a_minecraft_world():
+        return
+
+    _MC.set_block(
         turtle.position.x, turtle.position.y, turtle.position.z,
         block.PISTON, _turtle_facing())
     turtle.tiles[(turtle.position.x, turtle.position.y, turtle.position.z)] = (block.PISTON, _turtle_facing())
@@ -394,13 +398,16 @@ def _turtle_facing():
 def _draw_thing(position, *args):
     turtle = _get_turtle_session()
 
+    if not position.is_possible_in_a_minecraft_world():
+        return
+
     if isinstance(args[0], block_definition.BlockDefinition):
-        MC.set_block(
+        _MC.set_block(
             position.x, position.y, position.z,
             *args)
         turtle.tiles[(position.x, position.y, position.z)] = tuple(args)
     elif isinstance(args[0], living_definition.LivingDefinition):
-        entity = MC.spawn_entity(
+        entity = _MC.spawn_entity(
             position.x, position.y, position.z,
             args[0])
         _select_entity(entity)
@@ -578,8 +585,8 @@ def pen_down(*args):
         the_type = args[0]
         value_args = args[1:]
 
-        if len(filter(lambda v: isinstance(v, block_property.PropertyWithValue), value_args)) != len(value_args) or \
-                len(filter(lambda v: v.block_property in the_type.ALL_PROPERTIES, value_args)) != len(value_args):
+        if len(filter(lambda v: isinstance(v, block_property.PropertyWithValue) and \
+            v.block_property in the_type.ALL_PROPERTIES, value_args)) != len(value_args):
             all_values_str = ""
             for p in the_type.ALL_PROPERTIES:
                 all_values_str += "\n"
@@ -636,16 +643,16 @@ def start_task(task, selector=_select_all_living_of_type):
     def all_tasks_at_once(mc):
         for entity_uuid in _select_all_living_of_type(task, living_things()):
             mc.living_entity_start_task(entity_uuid, task)
-    MC.batch(all_tasks_at_once)
+    _MC.batch(all_tasks_at_once)
 
 def reset_task(task, selector=_select_all_living_of_type):
     def all_tasks_at_once(mc):
         for entity_uuid in _select_all_living_of_type(task, living_things()):
             mc.living_entity_reset_task(entity_uuid, task)
-    MC.batch(all_tasks_at_once)
+    _MC.batch(all_tasks_at_once)
 
 def current_position():
-    return MC.get_player_tile_pos()
+    return _MC.get_player_tile_pos()
 
 HORIZON_DISTANCE = 32*16 # 32 chunks * 16 blocks / chunk
 
@@ -664,7 +671,7 @@ def nearby():
     return cube_centered_on(current_position(), center_to_edge_length=HORIZON_DISTANCE)
 
 def select_living_things(cube_corners):
-    results = MC.get_all_entities_in_bounding_box(cube_corners[0], cube_corners[1])
+    results = _MC.get_all_entities_in_bounding_box(cube_corners[0], cube_corners[1])
     for entity in results:
         _select_entity(entity)
 

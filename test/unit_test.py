@@ -183,6 +183,33 @@ class TestUnit(unittest.TestCase):
         with self.assertRaisesRegexp(AssertionError, "Oops, forward\(abc\) won't work. Distance must be a whole number between 1 and 1000."):
             forward('abc')
 
+    def test_forward_outside_of_game_boundaries_just_doesnt_attempt_to_lay_blocks__more_than_max_y(self):
+        self.game.player.tile_pos = Vector(100,253,300)
+        self.game.player.rotation = 2
+        self.begin_for_testing(start_distance_from_player=5)
+
+        up(90)
+        forward(10)
+
+        self.assertEqual({
+            (100,253,305): "gold_block",
+            (100,254,305): "gold_block",
+            (100,255,305): "gold_block"
+        }, self.game.tiles)
+
+    def test_forward_outside_of_game_boundaries_just_doesnt_attempt_to_lay_blocks__less_than_min_y(self):
+        self.game.player.tile_pos = Vector(100,2,300)
+        self.game.player.rotation = 2
+        self.begin_for_testing(start_distance_from_player=5)
+
+        down(90)
+        forward(10)
+
+        self.assertEqual({
+            (100,2,305): "gold_block",
+            (100,1,305): "gold_block",
+            (100,0,305): "gold_block"
+        }, self.game.tiles)
 
     def test_back(self):
         self.begin_for_testing()
@@ -345,6 +372,45 @@ class TestUnit(unittest.TestCase):
             (100,200,301): "gold_block",
             (100,199,301): "gold_block",
             (100,198,301): ("piston", {"facing":"down"})
+        }, self.game.tiles)
+
+    def test_math_bug__turtle_wont_turn_right_when_going_down_or_up(self):
+        self.begin_for_testing()
+        forward(2)
+        down(90)
+        forward(2)
+        right(90)
+        forward(2)
+        self.assertEqual({
+            (100,200,300): "gold_block",
+            (100,200,301): "gold_block",
+
+            (100,200,302): "gold_block",
+            (100,199,302): "gold_block",
+
+            # turtle should have gone right but it didn't.
+
+            (100,198,302): "gold_block",
+            (100,197,302): "gold_block",
+            (100,196,302): ("piston", {"facing":"down"})
+        }, self.game.tiles)
+
+    def test_some_more_turning(self):
+        self.begin_for_testing()
+        forward(2)
+        right(90)
+        forward(2)
+        down(90)
+        forward(2)
+        print self.game.tiles
+        self.assertEqual({
+            (100,200,300): "gold_block",
+            (100,200,301): "gold_block",
+            (100,200,302): "gold_block",
+            (99,200,302): "gold_block",
+            (98,200,302): "gold_block",
+            (98,199,302): "gold_block",
+            (98,198,302): ("piston", {"facing":"down"})
         }, self.game.tiles)
 
     def test_turn_methods_take_valid_degrees(self):

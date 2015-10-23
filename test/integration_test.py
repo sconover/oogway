@@ -13,7 +13,7 @@ sys.path.append(turtle_path)
 import unittest
 import mcpi.minecraft
 import mcpi
-from oogway.turtle import init, chat, begin, forward, up, right, left, pen_down, delay, down, start_task, reset_task, select_living_things, nearby
+from oogway.turtle import init, chat, begin, forward, back, up, right, left, pen_down, delay, down, start_task, reset_task, select_living_things, nearby
 from mcgamedata import block, living
 from time import sleep
 

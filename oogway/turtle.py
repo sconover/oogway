@@ -181,7 +181,7 @@ class Minecraft():
         return int(self._m().player.getRotation())
 
     def get_player_tile_pos(self):
-        vec = self._m().player.getTilePos()
+        vec = self._m().player.getTilePosV2(self._m().player.name)
         return Position(vec.x, vec.y, vec.z)
 
     def chat(self, message):

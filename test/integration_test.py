@@ -53,15 +53,30 @@ class TestIntegration(unittest.TestCase):
         # forward()
 
         begin()
-        # delay(0.01)
+        delay(0)
+        up(90)
+        for i in xrange(300):
+            forward(1)
+        down(180)
+        for i in xrange(300):
+            forward(1)
+
+        # for i in xrange(10):
+        #     for i in xrange(1000):
+        #         forward(10)
+        #     back(1)
+        #     for i in xrange(1000):
+        #         forward(10)
+
+
         # pen_down(living.COW)
 
         # for i in xrange(50):
         #         forward()
 
         # sleep(5)
-        select_living_things(nearby())
-        start_task(living.COW.PANIC)
+        # select_living_things(nearby())
+        # start_task(living.COW.PANIC)
         # start_task(living.OCELOT.MATE)
         # reset_task(living.OCELOT.FOLLOW_OWNER)
         # start_task(living.OCELOT.OCELOT_ATTACK)

@@ -431,7 +431,7 @@ def _move(x,y,z, should_draw_turtle):
 
     turtle.position = b
     _draw_thing(a, *turtle.trail)
-    if should_draw_turtle:
+    if turtle.delay > 0.01 or should_draw_turtle:
         _draw_turtle()
 
 def _move_relative(x_diff, y_diff, z_diff, should_draw_turtle):

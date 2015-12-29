@@ -134,16 +134,23 @@ class TestIntegration(unittest.TestCase):
         # math bug START
 
         begin()
-        forward(2)
+        delay(0)
+        down(90)
+        forward(999)
+        up(90)
+        right(90)
+        forward(20)
+        up(90)
+        forward(999)
 
-        up(85)
-        forward(10)
+        # up(90)
+        # forward(10)
 
-        right(90) # turtle does not actually turn, keeps going up
-        forward(10)
+        # right(90) # turtle does not actually turn, keeps going up
+        # forward(10)
 
-        right(90) # turtle does not actually turn, keeps going up
-        forward(10)
+        # right(90) # turtle does not actually turn, keeps going up
+        # forward(10)
 
         # math bug END
 

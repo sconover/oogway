@@ -374,7 +374,7 @@ class TestUnit(unittest.TestCase):
             (100,198,301): ("piston", {"facing":"down"})
         }, self.game.tiles)
 
-    def test_math_bug__turtle_wont_turn_right_when_going_down_or_up(self):
+    def test_show_that_turtle_wont_turn_right_when_going_down_or_up(self):
         self.begin_for_testing()
         forward(2)
         down(90)

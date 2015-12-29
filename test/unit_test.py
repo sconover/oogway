@@ -66,6 +66,8 @@ class FakeMcpi():
         self.tiles = {}
 
     def getBlockV2(self,x,y,z):
+        if y < 0 or y >=255:
+            raise Exception("y out of bounds: " + str(y))
         parts = "10,10,10,piston,extended=false;facing=west".split(",")
         result = {"x": parts[0], "y": parts[1], "z": parts[2], "type": parts[3]}
         result["properties"] = dict(map(lambda line: line.split("="), parts[4].split(";")))
@@ -682,14 +684,21 @@ class TestUnit(unittest.TestCase):
     def test_peek(self):
         self.begin_for_testing()
         block_result = peek()
-        print str(block_result)
         self.assertEqual(block_result, block.PISTON)
         self.assertEqual(block.PISTON, block_result.definition)
 
-        self.assertEqual((
+        self.assertEqual([
             block.PISTON.EXTENDED_FALSE,
             block.PISTON.FACING_WEST
-        ), block_result.properties)
+        ], block_result.properties)
+
+    def test_peek_limit(self):
+        self.begin_for_testing()
+        down(90)
+        forward(300)
+        self.assertEqual(None, peek())
+        up(180)
+        forward(700)
 
 if __name__ == '__main__':
     os.environ['TEST'] = "true"

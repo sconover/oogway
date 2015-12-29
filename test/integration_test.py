@@ -14,7 +14,7 @@ import unittest
 import mcpi.minecraft
 import mcpi
 import logging
-from oogway.turtle import init, chat, begin, forward, back, up, right, left, pen_down, delay, down, start_task, reset_task, select_living_things, nearby
+from oogway.turtle import init, chat, begin, forward, back, up, right, left, pen_down, delay, down, start_task, reset_task, select_living_things, nearby, peek
 from mcgamedata import block, living
 from time import sleep
 
@@ -135,8 +135,10 @@ class TestIntegration(unittest.TestCase):
 
         begin()
         delay(0)
-        # down(90)
-        forward(10)
+        up(90)
+        for _ in xrange(200):
+            forward(1)
+            print peek()
 
         # up(90)
         # right(90)

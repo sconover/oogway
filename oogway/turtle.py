@@ -202,7 +202,7 @@ class Minecraft():
 class BlockResult():
     def __init__(self, block_definition, *block_properties):
         self.definition = block_definition
-        self.properties = block_properties
+        self.properties = list(block_properties)
 
     def __eq__(self, other):
         if isinstance(other, block_definition.BlockDefinition):
@@ -212,7 +212,9 @@ class BlockResult():
 
     def __str__(self):
         # TODO: friendlier
-        return str([self.definition.short_usage_str, self.properties])
+        parts = [self.definition.short_usage_str]
+        parts.extend(map(lambda p: self.definition.short_usage_str + "." + p.value_str, self.properties))
+        return ",".join(parts)
 
     def __repr__(self, other):
         return str(self)
@@ -829,7 +831,14 @@ def down(degrees):
 def peek():
     turtle = _get_turtle_session()
     position_diff = calculate_point_on_sphere2(direction=turtle.direction, radius=1)
-    return _MC.get_block(
-        turtle.position.x + position_diff.x,
-        turtle.position.y + position_diff.y,
-        turtle.position.z + position_diff.z)
+    peek_x = turtle.position.x + position_diff.x
+    peek_y = turtle.position.y + position_diff.y
+    peek_z = turtle.position.z + position_diff.z
+
+    if Position(peek_x, peek_y, peek_z).is_possible_in_a_minecraft_world():
+        return _MC.get_block(
+            turtle.position.x + position_diff.x,
+            turtle.position.y + position_diff.y,
+            turtle.position.z + position_diff.z)
+    else:
+        return None

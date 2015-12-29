@@ -70,12 +70,12 @@ Code samples are verified as part of the unit_test.py test run
 >>> left(180)
 >>> polygon(3, 5)                  # back-left foot
 >>> get_tiles()
-            E
-        E E E                     E E E E
-    E E     E     E E E     E E E       E
-      E E   E   E       E E E           E
+            E E
+        E E   E                   E E E E
+    E E       E   E E E     E E E       E
+      E E     E E       E E E
           E E E             E E       E
-        E E v                 E E     E
+        E E   v               E E     E
     E E                           E E E
   E                                 E E E
 E                                         E
@@ -93,11 +93,11 @@ E                                         E
 E E                                     E E
   E E                               E E
       E E                       E E E E E
-          E                 E E E       E
-  E E E E E E E E         E E           E
-    E     E     E E   E E     E       E
+          E E                 E E       E
+    E E E E E E E           E           E
+      E     E   E E   E E     E       E
       E   E         E           E     E
-      E E                         E   E
+        E E                       E   E
         E                           E
 """
 
@@ -105,7 +105,7 @@ import sys, os
 from mcgamedata import block, block_definition, block_property, living, living_definition
 from collections import namedtuple
 from time import sleep
-from sphere_math import calculate_point_on_sphere
+from sphere_math import calculate_point_on_sphere2
 from orientation import Position, Direction
 
 class TurtleSession():
@@ -303,10 +303,11 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
     """
     pos = _MC.get_player_tile_pos()
     rotation_degrees = _MC.get_player_rotation_degrees()
+
     if rotation_degrees < 0:
         rotation_degrees = 360 + rotation_degrees
 
-    horizon_pitch = 90
+    horizon_pitch = 0
 
     facing = _facing_based_on_yaw(rotation_degrees)
     yaw = 0
@@ -318,7 +319,7 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
         yaw = 0
     elif facing == block.PISTON.FACING_EAST:
         yaw = 90
-    position_diff = calculate_point_on_sphere(direction=Direction(yaw, horizon_pitch, 0), radius=start_distance_from_player)
+    position_diff = calculate_point_on_sphere2(direction=Direction(yaw, horizon_pitch, 0), radius=start_distance_from_player)
 
     start_x = pos.x + position_diff.x
     start_y = pos.y + position_diff.y
@@ -348,15 +349,15 @@ def _draw_turtle():
 def _facing_based_on_yaw(yaw):
     facing = None
     if yaw >= 0:
-        facing = block.PISTON.FACING_WEST
-    if yaw >= 45:
         facing = block.PISTON.FACING_NORTH
-    if yaw >= 135:
+    if yaw >= 45:
         facing = block.PISTON.FACING_EAST
-    if yaw >= 225:
+    if yaw >= 135:
         facing = block.PISTON.FACING_SOUTH
-    if yaw >= 315:
+    if yaw >= 225:
         facing = block.PISTON.FACING_WEST
+    if yaw >= 315:
+        facing = block.PISTON.FACING_NORTH
 
     return facing
 
@@ -383,15 +384,15 @@ def _turtle_facing():
     facing = facing_from_yaw
 
     if turtle.direction.pitch >= 0:
-        facing = facing = block.PISTON.FACING_UP
-    if turtle.direction.pitch >= 45:
-        facing = facing_from_yaw
-    if turtle.direction.pitch >= 135:
-        facing = block.PISTON.FACING_DOWN
-    if turtle.direction.pitch >= 225:
         facing = _opposite_facing(facing_from_yaw)
-    if turtle.direction.pitch >= 315:
+    if turtle.direction.pitch >= 45:
+        facing = block.PISTON.FACING_DOWN
+    if turtle.direction.pitch >= 135:
+        facing = facing_from_yaw
+    if turtle.direction.pitch >= 225:
         facing = block.PISTON.FACING_UP
+    if turtle.direction.pitch >= 315:
+        facing = _opposite_facing(facing_from_yaw)
 
     return facing
 
@@ -422,7 +423,7 @@ def _select_entity(entity):
     else:
         turtle.living_things_selected[entity.uuid] = None
 
-def _move(x,y,z):
+def _move(x,y,z, should_draw_turtle):
     turtle = _get_turtle_session()
     turtle.sleep(turtle.delay)
     a = turtle.position
@@ -430,14 +431,16 @@ def _move(x,y,z):
 
     turtle.position = b
     _draw_thing(a, *turtle.trail)
-    _draw_turtle()
+    if should_draw_turtle:
+        _draw_turtle()
 
-def _move_relative(x_diff, y_diff, z_diff):
+def _move_relative(x_diff, y_diff, z_diff, should_draw_turtle):
     turtle = _get_turtle_session()
     _move(
             turtle.position.x + x_diff,
             turtle.position.y + y_diff,
-            turtle.position.z + z_diff)
+            turtle.position.z + z_diff,
+            should_draw_turtle)
 
 def _is_number(x):
     return isinstance(x, (int, long, float, complex))
@@ -502,9 +505,9 @@ def forward(distance):
     _check_distance(distance, "Oops, forward({}) won't work.".format(distance), "Try this:\n\nforward(3)")
 
     turtle = _get_turtle_session()
-    for _ in xrange(distance):
-        position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
-        _move_relative(position_diff.x, position_diff.y, position_diff.z)
+    for i in xrange(distance):
+        position_diff = calculate_point_on_sphere2(direction=turtle.direction, radius=1)
+        _move_relative(position_diff.x, position_diff.y, position_diff.z, i==distance-1)
 
 def back(distance):
     """Move the turtle backward a given distance (opposite of its current direction).

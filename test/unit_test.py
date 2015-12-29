@@ -26,7 +26,7 @@ class FakeMcpiPlayer():
     def getRotation(self):
         return self.rotation
 
-    def getTilePos(self):
+    def getTilePosV2(self, player_name):
         return self.tile_pos
 
 class EntitySpawnResult():

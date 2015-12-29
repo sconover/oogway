@@ -13,9 +13,20 @@ sys.path.append(turtle_path)
 import unittest
 import mcpi.minecraft
 import mcpi
+import logging
 from oogway.turtle import init, chat, begin, forward, back, up, right, left, pen_down, delay, down, start_task, reset_task, select_living_things, nearby
 from mcgamedata import block, living
 from time import sleep
+
+# define a Handler which writes INFO messages or higher to the sys.stderr
+console = logging.StreamHandler(stream=sys.stderr)
+console.setLevel(logging.DEBUG)
+# set a format which is simpler for console use
+formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+# tell the handler to use this format
+console.setFormatter(formatter)
+# add the handler to the root logger
+logging.getLogger('oogway.sphere_math').addHandler(console)
 
 class TestIntegration(unittest.TestCase):
     def test_basic(self):
@@ -52,14 +63,14 @@ class TestIntegration(unittest.TestCase):
         # forward()
         # forward()
 
-        begin()
-        delay(0)
-        up(90)
-        for i in xrange(300):
-            forward(1)
-        down(180)
-        for i in xrange(300):
-            forward(1)
+        # begin()
+        # delay(0)
+        # up(90)
+        # for i in xrange(300):
+        #     forward(1)
+        # down(180)
+        # for i in xrange(300):
+        #     forward(1)
 
         # for i in xrange(10):
         #     for i in xrange(1000):
@@ -115,18 +126,26 @@ class TestIntegration(unittest.TestCase):
 
         # right(90)
 
-        # forward()
-        # forward()
+
+        # forward(2)
 
         # down(90)
-        # forward()
-        # forward()
 
-        # # up(90)
-        # right(90) # turtle does not actually turn, keeps going up
-        # forward()
-        # forward()
+        # math bug START
 
+        begin()
+        forward(2)
+
+        up(85)
+        forward(10)
+
+        right(90) # turtle does not actually turn, keeps going up
+        forward(10)
+
+        right(90) # turtle does not actually turn, keeps going up
+        forward(10)
+
+        # math bug END
 
         # forward()
         # forward()

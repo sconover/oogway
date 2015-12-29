@@ -135,13 +135,14 @@ class TestIntegration(unittest.TestCase):
 
         begin()
         delay(0)
-        down(90)
-        forward(999)
-        up(90)
-        right(90)
-        forward(20)
-        up(90)
-        forward(999)
+        # down(90)
+        forward(10)
+
+        # up(90)
+        # right(90)
+        # forward(20)
+        # up(90)
+        # forward(999)
 
         # up(90)
         # forward(10)

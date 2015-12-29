@@ -148,6 +148,17 @@ class Minecraft():
         f(self)
         self._m().endBatch() # todo: guard against failed ends from exceptions/errors?
 
+    def get_block(self, x, y, z):
+        # cast to int. we're mapping a continuous space of very high precision,
+        # on to a grid.
+        block_info = self._m().getBlockV2(int(x), int(y), int(z))
+        block_def = block.from_block_type_name(block_info["type"])
+        block_properties = []
+        if "properties" in block_info:
+            for k in sorted(block_info["properties"]):
+                block_properties.append(block_def.get_property(k).get_value_by_str(block_info["properties"][k]))
+        return BlockResult(block_def, *block_properties)
+
     def set_block(self, x, y, z, gamedata_block, *gamedata_properties):
         property_to_value = {}
         for p in gamedata_properties:
@@ -188,6 +199,24 @@ class Minecraft():
         self._m().postToChat(message)
         return ChatResult(message)
 
+class BlockResult():
+    def __init__(self, block_definition, *block_properties):
+        self.definition = block_definition
+        self.properties = block_properties
+
+    def __eq__(self, other):
+        if isinstance(other, block_definition.BlockDefinition):
+            return other == self.definition
+        else:
+            return other.definition == self.definition
+
+    def __str__(self):
+        # TODO: friendlier
+        return str([self.definition.short_usage_str, self.properties])
+
+    def __repr__(self, other):
+        return str(self)
+
 class ChatResult():
     def __init__(self, message):
         self.message = message
@@ -200,7 +229,6 @@ class TilesResult():
         self.tiles = tiles
 
     def __repr__(self):
-        # return "tiles " + str(self.tiles)
         min_x = sys.maxint
         min_z = sys.maxint
         max_x = 0
@@ -797,3 +825,11 @@ def down(degrees):
     _check_degrees(degrees, "Oops, down({}) won't work.".format(degrees), "Try this:\n\ndown(90)")
 
     up(-1 * degrees)
+
+def peek():
+    turtle = _get_turtle_session()
+    position_diff = calculate_point_on_sphere2(direction=turtle.direction, radius=1)
+    return _MC.get_block(
+        turtle.position.x + position_diff.x,
+        turtle.position.y + position_diff.y,
+        turtle.position.z + position_diff.z)

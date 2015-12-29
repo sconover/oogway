@@ -9,7 +9,7 @@ sys.path.append(turtle_path)
 
 import oogway.turtle
 from oogway.turtle import init, chat, begin, forward, back, up, right, left, \
-    pen_down, pen_up, delay, down, living_things, start_task, reset_task, TilesResult
+    pen_down, pen_up, delay, down, living_things, start_task, reset_task, TilesResult, peek
 from mcgamedata import block, living
 
 class Vector():
@@ -64,6 +64,12 @@ class FakeMcpi():
     def reset(self):
         self.chat_log = []
         self.tiles = {}
+
+    def getBlockV2(self,x,y,z):
+        parts = "10,10,10,piston,extended=false;facing=west".split(",")
+        result = {"x": parts[0], "y": parts[1], "z": parts[2], "type": parts[3]}
+        result["properties"] = dict(map(lambda line: line.split("="), parts[4].split(";")))
+        return result
 
     def setBlockV2(self, x, y, z, block_type_name, **property_to_value):
         if property_to_value == {}:
@@ -672,6 +678,18 @@ class TestUnit(unittest.TestCase):
             ( 99,200,301): (block.GOLD_BLOCK),
             ( 98,200,301): (block.PISTON, block.PISTON.FACING_WEST)
         }).__repr__())
+
+    def test_peek(self):
+        self.begin_for_testing()
+        block_result = peek()
+        print str(block_result)
+        self.assertEqual(block_result, block.PISTON)
+        self.assertEqual(block.PISTON, block_result.definition)
+
+        self.assertEqual((
+            block.PISTON.EXTENDED_FALSE,
+            block.PISTON.FACING_WEST
+        ), block_result.properties)
 
 if __name__ == '__main__':
     os.environ['TEST'] = "true"

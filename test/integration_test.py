@@ -135,10 +135,10 @@ class TestIntegration(unittest.TestCase):
 
         begin()
         delay(0)
-        up(90)
+        down(90)
         for _ in xrange(200):
-            forward(1)
-            print peek()
+            print forward(1)
+            # print peek()
 
         # up(90)
         # right(90)

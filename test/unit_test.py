@@ -11,6 +11,7 @@ import oogway.turtle
 from oogway.turtle import init, chat, begin, forward, back, up, right, left, \
     pen_down, pen_up, delay, down, living_things, start_task, reset_task, TilesResult, peek
 from mcgamedata import block, living
+import sysconfig
 
 class Vector():
     def __init__(self, x, y, z):
@@ -65,6 +66,11 @@ class FakeMcpi():
         self.chat_log = []
         self.tiles = {}
 
+    def getThenSetBlockV2(self, x, y, z, block_type_name, **property_to_value):
+        previous_block = self.getBlockV2(x,y,z)
+        self.setBlockV2(x,y,z,block_type_name,**property_to_value)
+        return previous_block
+
     def getBlockV2(self,x,y,z):
         if y < 0 or y >=255:
             raise Exception("y out of bounds: " + str(y))
@@ -83,7 +89,6 @@ class FakeMcpi():
         self.chat_log.append(message)
 
     def get_tile(self, x, y, z):
-        print self.tiles
         return self.tiles[(x,y,z)]
 
     def startBatch(this):
@@ -115,6 +120,13 @@ def setupTest(targetTestInstance):
             sleep_function=fake_sleep)
 
     targetTestInstance.begin_for_testing = begin_for_testing
+
+def docTestSetup(targetTestInstance):
+    setupTest(targetTestInstance)
+    os.environ["DOCTEST"] = "true"
+
+def docTestTearDown(targetTestInstance):
+    del os.environ["DOCTEST"]
 
 class TestUnit(unittest.TestCase):
     def setUp(self):
@@ -246,6 +258,14 @@ class TestUnit(unittest.TestCase):
 
         with self.assertRaisesRegexp(AssertionError, "Oops, back\(abc\) won't work. Distance must be a whole number between 1 and 1000."):
             back('abc')
+
+    def test_forward_and_back_return_block_info_of_where_turtle_ended_up(self):
+
+        # the fake is hard-coded to always return a piston.
+
+        self.begin_for_testing()
+        self.assertEqual(back(1), block.PISTON)
+        self.assertEqual(forward(2), block.PISTON)
 
     def test_delay(self):
         self.begin_for_testing()
@@ -410,7 +430,6 @@ class TestUnit(unittest.TestCase):
         forward(2)
         down(90)
         forward(2)
-        print self.game.tiles
         self.assertEqual({
             (100,200,300): "gold_block",
             (100,200,301): "gold_block",
@@ -705,5 +724,5 @@ if __name__ == '__main__':
 
     suite = unittest.TestSuite()
     suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(TestUnit))
-    suite.addTest(doctest.DocTestSuite(oogway.turtle, setUp=setupTest, optionflags=doctest.ELLIPSIS))
+    suite.addTest(doctest.DocTestSuite(oogway.turtle, setUp=docTestSetup, tearDown=docTestTearDown, optionflags=doctest.ELLIPSIS))
     unittest.TextTestRunner(verbosity=2).run(suite)

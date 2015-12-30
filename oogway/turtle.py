@@ -105,7 +105,7 @@ import sys, os
 from mcgamedata import block, block_definition, block_property, living, living_definition
 from collections import namedtuple
 from time import sleep
-from sphere_math import calculate_point_on_sphere2
+from sphere_math import calculate_point_on_sphere
 from orientation import Position, Direction
 
 class TurtleSession():
@@ -363,7 +363,7 @@ def begin(start_distance_from_player=5, default_trail=[block.GOLD_BLOCK], sleep_
         yaw = 0
     elif facing == block.PISTON.FACING_EAST:
         yaw = 90
-    position_diff = calculate_point_on_sphere2(direction=Direction(yaw, horizon_pitch, 0), radius=start_distance_from_player)
+    position_diff = calculate_point_on_sphere(direction=Direction(yaw, horizon_pitch, 0), radius=start_distance_from_player)
 
     start_x = pos.x + position_diff.x
     start_y = pos.y + position_diff.y
@@ -559,11 +559,11 @@ def forward(distance):
 
     # all moves forward except the last one
     for i in xrange(distance-1):
-        position_diff = calculate_point_on_sphere2(direction=turtle.direction, radius=1)
+        position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
         _move_relative(position_diff.x, position_diff.y, position_diff.z, False)
 
     # last forward move
-    position_diff = calculate_point_on_sphere2(direction=turtle.direction, radius=1)
+    position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
     return _move_relative(position_diff.x, position_diff.y, position_diff.z, True)
 
 def back(distance):
@@ -857,7 +857,7 @@ def down(degrees):
 
 def peek():
     turtle = _get_turtle_session()
-    position_diff = calculate_point_on_sphere2(direction=turtle.direction, radius=1)
+    position_diff = calculate_point_on_sphere(direction=turtle.direction, radius=1)
     peek_x = turtle.position.x + position_diff.x
     peek_y = turtle.position.y + position_diff.y
     peek_z = turtle.position.z + position_diff.z

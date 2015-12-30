@@ -2,7 +2,7 @@ from math import sin, cos, radians, tan
 from orientation import Position
 from logging import getLogger
 
-def calculate_point_on_sphere2(direction, radius):
+def calculate_point_on_sphere(direction, radius):
     """
     Given a direction, that has Minecraft pitch and yaw, calculate the
     destination coordinates (x, y, z) on a sphere (imagine standing

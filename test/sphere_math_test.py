@@ -9,7 +9,7 @@ turtle_path = os.path.join(this_dir, "../")
 sys.path.append(mcgamedata_relative_path)
 sys.path.append(turtle_path)
 
-from oogway.sphere_math import calculate_point_on_sphere2
+from oogway.sphere_math import calculate_point_on_sphere
 from oogway.orientation import Direction, Position
 
 NORTH_HORIZON = Direction(180,0,0)
@@ -32,19 +32,19 @@ logging.getLogger('oogway.sphere_math').addHandler(console)
 
 class TestUnit(unittest.TestCase):
     def test_basics(self):
-        self.assertEqual(Position(0, 0, -1), calculate_point_on_sphere2(NORTH_HORIZON, 1))
-        self.assertEqual(Position(1, 0, 0), calculate_point_on_sphere2(EAST_HORIZON, 1))
-        self.assertEqual(Position(0, 0, 1), calculate_point_on_sphere2(SOUTH_HORIZON, 1))
-        self.assertEqual(Position(-1, 0, 0), calculate_point_on_sphere2(WEST_HORIZON, 1))
+        self.assertEqual(Position(0, 0, -1), calculate_point_on_sphere(NORTH_HORIZON, 1))
+        self.assertEqual(Position(1, 0, 0), calculate_point_on_sphere(EAST_HORIZON, 1))
+        self.assertEqual(Position(0, 0, 1), calculate_point_on_sphere(SOUTH_HORIZON, 1))
+        self.assertEqual(Position(-1, 0, 0), calculate_point_on_sphere(WEST_HORIZON, 1))
 
         # alternative north
-        self.assertEqual(Position(0, 0, 1), calculate_point_on_sphere2(Direction(-180,0,0), 1))
+        self.assertEqual(Position(0, 0, 1), calculate_point_on_sphere(Direction(-180,0,0), 1))
 
-        self.assertEqual(Position(0, 1, 0), calculate_point_on_sphere2(STRAIGHT_UP, 1))
-        self.assertEqual(Position(0, -1, 0), calculate_point_on_sphere2(STRAIGHT_DOWN, 1))
+        self.assertEqual(Position(0, 1, 0), calculate_point_on_sphere(STRAIGHT_UP, 1))
+        self.assertEqual(Position(0, -1, 0), calculate_point_on_sphere(STRAIGHT_DOWN, 1))
 
     def test_angles(self):
-        self.assertEqual(Position(0, 0.707, 0.707), calculate_point_on_sphere2(Direction(0,-45,0), 1))
+        self.assertEqual(Position(0, 0.707, 0.707), calculate_point_on_sphere(Direction(0,-45,0), 1))
 
 if __name__ == '__main__':
     unittest.main()

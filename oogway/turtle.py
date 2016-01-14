@@ -115,7 +115,7 @@ class TurtleSession():
         if "TEST" in os.environ:
             self.delay = 0
         else:
-            self.delay = 0.1
+            self.delay = 0.001
         self.trail = default_trail
         self.sleep = sleep_function
         self.living_things_selected = {}

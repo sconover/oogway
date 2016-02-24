@@ -224,6 +224,9 @@ class BlockResult():
         else:
             return other.definition == self.definition
 
+    def __ne__(self, other):
+        return not(self == other)
+
     def __str__(self):
         # TODO: friendlier
         parts = [self.definition.short_usage_str]

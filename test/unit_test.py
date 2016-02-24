@@ -706,6 +706,18 @@ class TestUnit(unittest.TestCase):
         self.assertEqual(block_result, block.PISTON)
         self.assertEqual(block.PISTON, block_result.definition)
 
+        self.assertTrue(block_result == block.PISTON)
+        self.assertFalse(block_result == block.OBSIDIAN)
+
+        self.assertTrue(block.PISTON == block_result.definition)
+        self.assertFalse(block.OBSIDIAN == block_result.definition)
+
+        self.assertFalse(block_result != block.PISTON)
+        self.assertTrue(block_result != block.OBSIDIAN)
+
+        self.assertFalse(block.PISTON != block_result.definition)
+        self.assertTrue(block.OBSIDIAN != block_result.definition)
+
         self.assertEqual([
             block.PISTON.EXTENDED_FALSE,
             block.PISTON.FACING_WEST

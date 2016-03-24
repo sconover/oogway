@@ -390,8 +390,8 @@ def _draw_turtle():
 
     previous_block = _MC.get_then_set_block(
         turtle.position.x, turtle.position.y, turtle.position.z,
-        block.PISTON, _turtle_facing())
-    turtle.tiles[(turtle.position.x, turtle.position.y, turtle.position.z)] = (block.PISTON, _turtle_facing())
+        block.PISTON, is_facing())
+    turtle.tiles[(turtle.position.x, turtle.position.y, turtle.position.z)] = (block.PISTON, is_facing())
     if "DOCTEST" in os.environ and os.environ["DOCTEST"] == "true":
         # this is a hack that makes it so doctests don't fail because of non-None result from begin, forward, and back
         return None
@@ -429,7 +429,7 @@ def _opposite_facing(facing):
     if facing == block.PISTON.FACING_UP:
         return block.PISTON.FACING_DOWN
 
-def _turtle_facing():
+def is_facing():
     turtle = _get_turtle_session()
 
     facing_from_yaw = _facing_based_on_yaw(turtle.direction.yaw)

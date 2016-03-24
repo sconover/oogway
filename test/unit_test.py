@@ -9,7 +9,7 @@ sys.path.append(turtle_path)
 
 import oogway.turtle
 from oogway.turtle import init, chat, begin, forward, back, up, right, left, \
-    pen_down, pen_up, delay, down, living_things, start_task, reset_task, TilesResult, peek
+    pen_down, pen_up, delay, down, living_things, start_task, reset_task, TilesResult, peek, is_facing
 from mcgamedata import block, living
 import sysconfig
 
@@ -730,6 +730,23 @@ class TestUnit(unittest.TestCase):
         self.assertEqual(None, peek())
         up(180)
         forward(700)
+
+    def test_is_facing(self):
+        self.begin_for_testing()
+
+        self.assertEqual(block.PISTON.FACING_SOUTH, is_facing())
+        right(90)
+        self.assertEqual(block.PISTON.FACING_WEST, is_facing())
+        right(90)
+        self.assertEqual(block.PISTON.FACING_NORTH, is_facing())
+        right(90)
+        self.assertEqual(block.PISTON.FACING_EAST, is_facing())
+        right(90)
+        self.assertEqual(block.PISTON.FACING_SOUTH, is_facing())
+        right(180)
+        self.assertEqual(block.PISTON.FACING_NORTH, is_facing())
+        left(90)
+        self.assertEqual(block.PISTON.FACING_WEST, is_facing())
 
 if __name__ == '__main__':
     os.environ['TEST'] = "true"
